@@ -21,15 +21,15 @@ const (
 )
 
 type (
+	WalletCurrency          string
 	WalletRecordKind        uint8
 	WalletTransactionStatus uint8
 
 	Wallet struct {
-		ID        uuid.UUID
-		AccountID uuid.UUID
+		ID uuid.UUID
 
-		Balance       *big.Int
-		LockedBalance *big.Int
+		Balance       map[WalletCurrency]*big.Int
+		LockedBalance map[WalletCurrency]*big.Int
 
 		CreatedAt time.Time
 		UpdatedAt *time.Time
@@ -39,9 +39,9 @@ type (
 	WalletRecord struct {
 		ID       uuid.UUID
 		WalletID uuid.UUID
+		Currency WalletCurrency
 		Value    *big.Int
 		Kind     WalletRecordKind
-		Nonce    uint64
 
 		Wallet    *Wallet
 		CreatedAt time.Time
@@ -55,15 +55,31 @@ type (
 	}
 )
 
-func (p *Wallet) SetBalance(balance, lockedBalance *big.Int) {
+func (p *Wallet) SetBalance(balance, lockedBalance map[WalletCurrency]*big.Int) error {
+	for _, b := range balance {
+		if b.Cmp(big.NewInt(0)) == -1 {
+			return errors.New("negative balance not allowed")
+		}
+	}
+
+	for _, b := range lockedBalance {
+		if b.Cmp(big.NewInt(0)) == -1 {
+			return errors.New("negative balance not allowed")
+		}
+	}
+
 	p.Balance = balance
+	p.LockedBalance = lockedBalance
 	p.Version = uuid.NewV4()
+
+	return nil
 }
 
-func (p *Wallet) Record(amount *big.Int, kind WalletRecordKind) *WalletRecord {
+func (p *Wallet) Record(amount *big.Int, kind WalletRecordKind, currency WalletCurrency) *WalletRecord {
 	return &WalletRecord{
 		ID:        uuid.NewV4(),
 		WalletID:  p.ID,
+		Currency:  currency,
 		Value:     amount,
 		Kind:      kind,
 		CreatedAt: time.Now(),
@@ -71,54 +87,79 @@ func (p *Wallet) Record(amount *big.Int, kind WalletRecordKind) *WalletRecord {
 	}
 }
 
-func (p *Wallet) Add(amount *big.Int) *WalletRecord {
-	return p.Record(amount, Sum)
+func (p *Wallet) Add(amount *big.Int, currency WalletCurrency) *WalletRecord {
+	return p.Record(amount, Sum, currency)
 }
 
-func (p *Wallet) Sub(amount *big.Int) *WalletRecord {
-	return p.Record(amount, Sub)
+func (p *Wallet) Sub(amount *big.Int, currency WalletCurrency) *WalletRecord {
+	return p.Record(amount, Sub, currency)
 }
 
-func (p *Wallet) Lock(amount *big.Int) *WalletRecord {
-	return p.Record(amount, Lock)
+func (p *Wallet) Lock(amount *big.Int, currency WalletCurrency) *WalletRecord {
+	return p.Record(amount, Lock, currency)
 }
 
-func (p *Wallet) Unlock(amount *big.Int) *WalletRecord {
-	return p.Record(amount, Unlock)
+func (p *Wallet) Unlock(amount *big.Int, currency WalletCurrency) *WalletRecord {
+	return p.Record(amount, Unlock, currency)
 }
 
 func (p *Wallet) Apply(records ...*WalletRecord) error {
-	currentAmount := new(big.Int).Set(p.Balance)
-	currentLockedAmount := new(big.Int).Set(p.LockedBalance)
+	balances := make(map[WalletCurrency]*big.Int)
+	lockedBalances := make(map[WalletCurrency]*big.Int)
 
 	for i := range records {
+		currency := records[i].Currency
+		_, found := balances[currency]
+		if !found {
+			balances[currency] = p.BalanceOf(currency)
+		}
+		currentBalance := balances[currency]
+
+		_, found = lockedBalances[currency]
+		if !found {
+			lockedBalances[currency] = p.LockedBalanceOf(currency)
+		}
+		currentLockedBalance := lockedBalances[currency]
+
 		switch records[i].Kind {
 		case Sum:
-			currentAmount.Add(currentAmount, records[i].Value)
+			currentBalance.Add(currentBalance, records[i].Value)
 		case Sub:
-			currentAmount.Sub(currentAmount, records[i].Value)
+			currentBalance.Sub(currentBalance, records[i].Value)
 		case Lock:
-			currentAmount.Sub(currentAmount, records[i].Value)
-			currentLockedAmount.Add(currentLockedAmount, records[i].Value)
+			currentBalance.Sub(currentBalance, records[i].Value)
+			currentLockedBalance.Add(currentLockedBalance, records[i].Value)
 		case Unlock:
-			currentLockedAmount.Sub(currentLockedAmount, records[i].Value)
-			currentAmount.Add(currentAmount, records[i].Value)
+			currentLockedBalance.Sub(currentLockedBalance, records[i].Value)
+			currentBalance.Add(currentBalance, records[i].Value)
 		default:
 			panic("")
 		}
 	}
 
-	if currentAmount.Cmp(big.NewInt(0)) == -1 {
-		return errors.New("")
+	err := p.SetBalance(balances, lockedBalances)
+	if err != nil {
+		return err
 	}
-
-	if currentLockedAmount.Cmp(big.NewInt(0)) == -1 {
-		return errors.New("")
-	}
-
-	p.SetBalance(currentAmount, currentLockedAmount)
 
 	return nil
+}
+
+func (p *Wallet) BalanceOf(currency WalletCurrency) *big.Int {
+	return p.balanceOf(p.Balance, currency)
+}
+
+func (p *Wallet) LockedBalanceOf(currency WalletCurrency) *big.Int {
+	return p.balanceOf(p.LockedBalance, currency)
+}
+
+func (p *Wallet) balanceOf(currencyMap map[WalletCurrency]*big.Int, currency WalletCurrency) *big.Int {
+	c, found := currencyMap[currency]
+	if !found {
+		return big.NewInt(0)
+	}
+
+	return new(big.Int).Set(c)
 }
 
 func (p *WalletRecord) Apply() error {

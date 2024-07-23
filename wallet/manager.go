@@ -21,10 +21,68 @@ type (
 	}
 )
 
+type ComplexTransferItem struct {
+	Currency     WalletCurrency
+	Amount       *big.Int
+	FromWalletID uuid.UUID
+	ToWalletID   uuid.UUID
+}
+
 // Transfer one amount from one wallet to another.
 //
 // If from wallet doesn't have the amount, an error will be thrown
-func (p *Manager) Transfer(ctx context.Context, fromWalletID uuid.UUID, toWalletID uuid.UUID, amount *big.Int) error {
+func (p *Manager) ComplexTransfer(ctx context.Context, toTransfer []*ComplexTransferItem) error {
+	p.l.Lock()
+	defer p.l.Unlock()
+
+	walletMap := make(map[uuid.UUID]*Wallet)
+	wallets := []*Wallet{}
+
+	var records []*WalletRecord
+	for _, t := range toTransfer {
+		var err error
+		fromWallet, found := walletMap[t.FromWalletID]
+		if !found {
+			fromWallet, err = p.d.WalletPersister.FindWalletByID(ctx, t.FromWalletID)
+			if err != nil {
+				return err
+			}
+			walletMap[t.FromWalletID] = fromWallet
+			wallets = append(wallets, fromWallet)
+		}
+
+		toWallet, found := walletMap[t.ToWalletID]
+		if !found {
+			toWallet, err = p.d.WalletPersister.FindWalletByID(ctx, t.ToWalletID)
+			if err != nil {
+				return err
+			}
+			walletMap[t.ToWalletID] = toWallet
+			wallets = append(wallets, toWallet)
+		}
+
+		rsub := fromWallet.Sub(t.Amount, t.Currency)
+		radd := toWallet.Add(t.Amount, t.Currency)
+		records = append(records, rsub, radd)
+	}
+
+	t := NewTransaction(records...)
+
+	err := t.Apply()
+	if err != nil {
+		return err
+	}
+
+	err = p.d.WalletPersister.SaveWallet(ctx, wallets, records, []*WalletTransaction{t})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Multi currency transfers the same amount of many currencies from one wallet to another
+func (p *Manager) MultiTransfer(ctx context.Context, fromWalletID uuid.UUID, toWalletID uuid.UUID, amounts map[WalletCurrency]*big.Int) error {
 	p.l.Lock()
 	defer p.l.Unlock()
 
@@ -38,8 +96,48 @@ func (p *Manager) Transfer(ctx context.Context, fromWalletID uuid.UUID, toWallet
 		return err
 	}
 
-	rsub := fromWallet.Sub(amount)
-	radd := toWallet.Add(amount)
+	var records []*WalletRecord
+	for currency, amount := range amounts {
+		rsub := fromWallet.Sub(amount, currency)
+		radd := toWallet.Add(amount, currency)
+
+		records = append(records, rsub, radd)
+	}
+
+	t := NewTransaction(records...)
+
+	err = t.Apply()
+	if err != nil {
+		return err
+	}
+
+	err = p.d.WalletPersister.SaveWallet(ctx, []*Wallet{fromWallet, toWallet}, records, []*WalletTransaction{t})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Transfer one amount from one wallet to another.
+//
+// If from wallet doesn't have the amount, an error will be thrown
+func (p *Manager) Transfer(ctx context.Context, fromWalletID uuid.UUID, toWalletID uuid.UUID, amount *big.Int, currency WalletCurrency) error {
+	p.l.Lock()
+	defer p.l.Unlock()
+
+	fromWallet, err := p.d.WalletPersister.FindWalletByID(ctx, fromWalletID)
+	if err != nil {
+		return err
+	}
+
+	toWallet, err := p.d.WalletPersister.FindWalletByID(ctx, toWalletID)
+	if err != nil {
+		return err
+	}
+
+	rsub := fromWallet.Sub(amount, currency)
+	radd := toWallet.Add(amount, currency)
 
 	t := NewTransaction(rsub, radd)
 
@@ -59,7 +157,7 @@ func (p *Manager) Transfer(ctx context.Context, fromWalletID uuid.UUID, toWallet
 // Removes amount from the given wallet
 //
 // If no amount is available in the given wallet, an error will be thrown
-func (p *Manager) Burn(ctx context.Context, fromWalletID uuid.UUID, amount *big.Int) error {
+func (p *Manager) Burn(ctx context.Context, fromWalletID uuid.UUID, amount *big.Int, currency WalletCurrency) error {
 	p.l.Lock()
 	defer p.l.Unlock()
 
@@ -68,7 +166,7 @@ func (p *Manager) Burn(ctx context.Context, fromWalletID uuid.UUID, amount *big.
 		return err
 	}
 
-	rsub := fromWallet.Sub(amount)
+	rsub := fromWallet.Sub(amount, currency)
 
 	t := NewTransaction(rsub)
 
@@ -86,7 +184,7 @@ func (p *Manager) Burn(ctx context.Context, fromWalletID uuid.UUID, amount *big.
 }
 
 // Add funds to the given wallet
-func (p *Manager) Mint(ctx context.Context, toWalletID uuid.UUID, amount *big.Int) error {
+func (p *Manager) Mint(ctx context.Context, toWalletID uuid.UUID, amount *big.Int, currency WalletCurrency) error {
 	p.l.Lock()
 	defer p.l.Unlock()
 
@@ -95,7 +193,7 @@ func (p *Manager) Mint(ctx context.Context, toWalletID uuid.UUID, amount *big.In
 		return err
 	}
 
-	radd := toWallet.Add(amount)
+	radd := toWallet.Add(amount, currency)
 
 	t := NewTransaction(radd)
 	err = t.Apply()
@@ -115,7 +213,7 @@ func (p *Manager) Mint(ctx context.Context, toWalletID uuid.UUID, amount *big.In
 //
 // While burn transactions also do the same,
 // Lock transaction is created with the meaning of unlock it at any time.
-func (p *Manager) Lock(ctx context.Context, fromWalletID uuid.UUID, amount *big.Int) error {
+func (p *Manager) Lock(ctx context.Context, fromWalletID uuid.UUID, amount *big.Int, currency WalletCurrency) error {
 	p.l.Lock()
 	defer p.l.Unlock()
 
@@ -124,7 +222,7 @@ func (p *Manager) Lock(ctx context.Context, fromWalletID uuid.UUID, amount *big.
 		return err
 	}
 
-	rlock := fromWallet.Lock(amount)
+	rlock := fromWallet.Lock(amount, currency)
 
 	t := NewTransaction(rlock)
 	err = t.Apply()
@@ -142,7 +240,7 @@ func (p *Manager) Lock(ctx context.Context, fromWalletID uuid.UUID, amount *big.
 
 // Unlock a given amount from wallet.
 // Unlock can not exceed current locked amount.
-func (p *Manager) Unlock(ctx context.Context, fromWalletID uuid.UUID, amount *big.Int) error {
+func (p *Manager) Unlock(ctx context.Context, fromWalletID uuid.UUID, amount *big.Int, currency WalletCurrency) error {
 	p.l.Lock()
 	defer p.l.Unlock()
 
@@ -151,7 +249,7 @@ func (p *Manager) Unlock(ctx context.Context, fromWalletID uuid.UUID, amount *bi
 		return err
 	}
 
-	runlock := fromWallet.Unlock(amount)
+	runlock := fromWallet.Unlock(amount, currency)
 
 	t := NewTransaction(runlock)
 	err = t.Apply()
@@ -171,7 +269,7 @@ func (p *Manager) Unlock(ctx context.Context, fromWalletID uuid.UUID, amount *bi
 //
 // Useful when you want to add a fund to a wallet but not want
 // the user to spend it until something occur.
-func (p *Manager) MintAndLock(ctx context.Context, toWalletID uuid.UUID, amount *big.Int) error {
+func (p *Manager) MintAndLock(ctx context.Context, toWalletID uuid.UUID, amount *big.Int, currency WalletCurrency) error {
 	p.l.Lock()
 	defer p.l.Unlock()
 
@@ -180,8 +278,8 @@ func (p *Manager) MintAndLock(ctx context.Context, toWalletID uuid.UUID, amount 
 		return err
 	}
 
-	radd := toWallet.Add(amount)
-	rlock := toWallet.Lock(amount)
+	radd := toWallet.Add(amount, currency)
+	rlock := toWallet.Lock(amount, currency)
 
 	t := NewTransaction(radd, rlock)
 	err = t.Apply()
@@ -201,7 +299,7 @@ func (p *Manager) MintAndLock(ctx context.Context, toWalletID uuid.UUID, amount 
 //
 // Useful when you want unlock some amount and immediatelly burns,
 // making this amount unavailable to the given user.
-func (p *Manager) UnlockAndBurn(ctx context.Context, fromWalletID uuid.UUID, amount *big.Int) error {
+func (p *Manager) UnlockAndBurn(ctx context.Context, fromWalletID uuid.UUID, amount *big.Int, currency WalletCurrency) error {
 	p.l.Lock()
 	defer p.l.Unlock()
 
@@ -210,8 +308,8 @@ func (p *Manager) UnlockAndBurn(ctx context.Context, fromWalletID uuid.UUID, amo
 		return err
 	}
 
-	runlock := fromWallet.Unlock(amount)
-	rsub := fromWallet.Sub(amount)
+	runlock := fromWallet.Unlock(amount, currency)
+	rsub := fromWallet.Sub(amount, currency)
 
 	t := NewTransaction(runlock, rsub)
 
@@ -221,6 +319,50 @@ func (p *Manager) UnlockAndBurn(ctx context.Context, fromWalletID uuid.UUID, amo
 	}
 
 	err = p.d.WalletPersister.SaveWallet(ctx, []*Wallet{fromWallet}, []*WalletRecord{runlock, rsub}, []*WalletTransaction{t})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Trade unlocks a balance from one wallet and send it to another wallet.
+// It does the same on the opposit side
+func (p *Manager) Trade(ctx context.Context,
+	fromWalletID uuid.UUID,
+	fromAmount *big.Int,
+	fromCurrency WalletCurrency,
+	toWalletID uuid.UUID,
+	toAmount *big.Int,
+	toCurrency WalletCurrency) error {
+	p.l.Lock()
+	defer p.l.Unlock()
+
+	fromWallet, err := p.d.WalletPersister.FindWalletByID(ctx, fromWalletID)
+	if err != nil {
+		return err
+	}
+
+	toWallet, err := p.d.WalletPersister.FindWalletByID(ctx, toWalletID)
+	if err != nil {
+		return err
+	}
+
+	rfunlock := fromWallet.Unlock(fromAmount, fromCurrency)
+	rsub := fromWallet.Sub(fromAmount, fromCurrency)
+	tadd := toWallet.Add(fromAmount, fromCurrency)
+
+	tfunlock := toWallet.Unlock(toAmount, toCurrency)
+	tsub := toWallet.Sub(toAmount, toCurrency)
+	radd := fromWallet.Add(toAmount, toCurrency)
+
+	t := NewTransaction(rfunlock, rsub, tadd, tfunlock, tsub, radd)
+	err = t.Apply()
+	if err != nil {
+		return err
+	}
+
+	err = p.d.WalletPersister.SaveWallet(ctx, []*Wallet{fromWallet}, t.WalletRecords, []*WalletTransaction{t})
 	if err != nil {
 		return err
 	}
