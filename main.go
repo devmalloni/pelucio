@@ -1,5 +1,7 @@
 package main
 
-func main() {
+import "pelucio/cmd"
 
+func main() {
+	cmd.Execute()
 }

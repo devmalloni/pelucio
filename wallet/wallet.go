@@ -26,14 +26,14 @@ type (
 	WalletTransactionStatus uint8
 
 	Wallet struct {
-		ID uuid.UUID
+		ID uuid.UUID `json:"id,omitempty"`
 
-		Balance       map[WalletCurrency]*big.Int
-		LockedBalance map[WalletCurrency]*big.Int
+		Balance       map[WalletCurrency]*big.Int `json:"balance,omitempty"`
+		LockedBalance map[WalletCurrency]*big.Int `json:"lockedBalance,omitempty"`
 
-		CreatedAt time.Time
-		UpdatedAt *time.Time
-		Version   uuid.UUID
+		CreatedAt time.Time  `json:"createdAt,omitempty"`
+		UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+		Version   uuid.UUID  `json:"version,omitempty"`
 	}
 
 	WalletRecord struct {
@@ -52,6 +52,17 @@ type (
 		WalletRecords []*WalletRecord
 		Status        WalletTransactionStatus
 		CreatedAt     time.Time
+	}
+
+	WalletUint64 struct {
+		ID uuid.UUID `json:"id,omitempty"`
+
+		Balance       map[WalletCurrency]*uint64 `json:"balance,omitempty"`
+		LockedBalance map[WalletCurrency]*uint64 `json:"lockedBalance,omitempty"`
+
+		CreatedAt time.Time  `json:"createdAt,omitempty"`
+		UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+		Version   uuid.UUID  `json:"version,omitempty"`
 	}
 )
 
@@ -160,6 +171,30 @@ func (p *Wallet) balanceOf(currencyMap map[WalletCurrency]*big.Int, currency Wal
 	}
 
 	return new(big.Int).Set(c)
+}
+
+func (p *Wallet) ToWalletUint64() *WalletUint64 {
+	balance := make(map[WalletCurrency]*uint64)
+	lockedBalance := make(map[WalletCurrency]*uint64)
+
+	for k, v := range p.Balance {
+		u := v.Uint64()
+		balance[k] = &u
+	}
+
+	for k, v := range p.LockedBalance {
+		u := v.Uint64()
+		lockedBalance[k] = &u
+	}
+
+	return &WalletUint64{
+		ID:            p.ID,
+		Version:       p.Version,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
+		Balance:       balance,
+		LockedBalance: lockedBalance,
+	}
 }
 
 func (p *WalletRecord) Apply() error {

@@ -9,8 +9,8 @@ import (
 )
 
 type (
-	managerDependencies struct {
-		WalletPersister
+	managerDependencies interface {
+		PersisterProvider
 	}
 	ManagerProvider interface {
 		WalletManager() *Manager
@@ -28,6 +28,13 @@ type ComplexTransferItem struct {
 	ToWalletID   uuid.UUID
 }
 
+func NewManager(d managerDependencies) *Manager {
+	return &Manager{
+		l: sync.Mutex{},
+		d: d,
+	}
+}
+
 // Transfer one amount from one wallet to another.
 //
 // If from wallet doesn't have the amount, an error will be thrown
@@ -43,7 +50,7 @@ func (p *Manager) ComplexTransfer(ctx context.Context, toTransfer []*ComplexTran
 		var err error
 		fromWallet, found := walletMap[t.FromWalletID]
 		if !found {
-			fromWallet, err = p.d.WalletPersister.FindWalletByID(ctx, t.FromWalletID)
+			fromWallet, err = p.d.WalletPersister().FindWalletByID(ctx, t.FromWalletID)
 			if err != nil {
 				return err
 			}
@@ -53,7 +60,7 @@ func (p *Manager) ComplexTransfer(ctx context.Context, toTransfer []*ComplexTran
 
 		toWallet, found := walletMap[t.ToWalletID]
 		if !found {
-			toWallet, err = p.d.WalletPersister.FindWalletByID(ctx, t.ToWalletID)
+			toWallet, err = p.d.WalletPersister().FindWalletByID(ctx, t.ToWalletID)
 			if err != nil {
 				return err
 			}
@@ -73,7 +80,7 @@ func (p *Manager) ComplexTransfer(ctx context.Context, toTransfer []*ComplexTran
 		return err
 	}
 
-	err = p.d.WalletPersister.SaveWallet(ctx, wallets, records, []*WalletTransaction{t})
+	err = p.d.WalletPersister().SaveWallet(ctx, wallets, records, []*WalletTransaction{t})
 	if err != nil {
 		return err
 	}
@@ -86,12 +93,12 @@ func (p *Manager) MultiTransfer(ctx context.Context, fromWalletID uuid.UUID, toW
 	p.l.Lock()
 	defer p.l.Unlock()
 
-	fromWallet, err := p.d.WalletPersister.FindWalletByID(ctx, fromWalletID)
+	fromWallet, err := p.d.WalletPersister().FindWalletByID(ctx, fromWalletID)
 	if err != nil {
 		return err
 	}
 
-	toWallet, err := p.d.WalletPersister.FindWalletByID(ctx, toWalletID)
+	toWallet, err := p.d.WalletPersister().FindWalletByID(ctx, toWalletID)
 	if err != nil {
 		return err
 	}
@@ -111,7 +118,7 @@ func (p *Manager) MultiTransfer(ctx context.Context, fromWalletID uuid.UUID, toW
 		return err
 	}
 
-	err = p.d.WalletPersister.SaveWallet(ctx, []*Wallet{fromWallet, toWallet}, records, []*WalletTransaction{t})
+	err = p.d.WalletPersister().SaveWallet(ctx, []*Wallet{fromWallet, toWallet}, records, []*WalletTransaction{t})
 	if err != nil {
 		return err
 	}
@@ -126,12 +133,12 @@ func (p *Manager) Transfer(ctx context.Context, fromWalletID uuid.UUID, toWallet
 	p.l.Lock()
 	defer p.l.Unlock()
 
-	fromWallet, err := p.d.WalletPersister.FindWalletByID(ctx, fromWalletID)
+	fromWallet, err := p.d.WalletPersister().FindWalletByID(ctx, fromWalletID)
 	if err != nil {
 		return err
 	}
 
-	toWallet, err := p.d.WalletPersister.FindWalletByID(ctx, toWalletID)
+	toWallet, err := p.d.WalletPersister().FindWalletByID(ctx, toWalletID)
 	if err != nil {
 		return err
 	}
@@ -146,7 +153,7 @@ func (p *Manager) Transfer(ctx context.Context, fromWalletID uuid.UUID, toWallet
 		return err
 	}
 
-	err = p.d.WalletPersister.SaveWallet(ctx, []*Wallet{fromWallet, toWallet}, []*WalletRecord{radd, rsub}, []*WalletTransaction{t})
+	err = p.d.WalletPersister().SaveWallet(ctx, []*Wallet{fromWallet, toWallet}, []*WalletRecord{radd, rsub}, []*WalletTransaction{t})
 	if err != nil {
 		return err
 	}
@@ -161,7 +168,7 @@ func (p *Manager) Burn(ctx context.Context, fromWalletID uuid.UUID, amount *big.
 	p.l.Lock()
 	defer p.l.Unlock()
 
-	fromWallet, err := p.d.WalletPersister.FindWalletByID(ctx, fromWalletID)
+	fromWallet, err := p.d.WalletPersister().FindWalletByID(ctx, fromWalletID)
 	if err != nil {
 		return err
 	}
@@ -175,7 +182,7 @@ func (p *Manager) Burn(ctx context.Context, fromWalletID uuid.UUID, amount *big.
 		return err
 	}
 
-	err = p.d.WalletPersister.SaveWallet(ctx, []*Wallet{fromWallet}, []*WalletRecord{rsub}, []*WalletTransaction{t})
+	err = p.d.WalletPersister().SaveWallet(ctx, []*Wallet{fromWallet}, []*WalletRecord{rsub}, []*WalletTransaction{t})
 	if err != nil {
 		return err
 	}
@@ -188,7 +195,7 @@ func (p *Manager) Mint(ctx context.Context, toWalletID uuid.UUID, amount *big.In
 	p.l.Lock()
 	defer p.l.Unlock()
 
-	toWallet, err := p.d.WalletPersister.FindWalletByID(ctx, toWalletID)
+	toWallet, err := p.d.WalletPersister().FindWalletByID(ctx, toWalletID)
 	if err != nil {
 		return err
 	}
@@ -201,7 +208,7 @@ func (p *Manager) Mint(ctx context.Context, toWalletID uuid.UUID, amount *big.In
 		return err
 	}
 
-	err = p.d.WalletPersister.SaveWallet(ctx, []*Wallet{toWallet}, []*WalletRecord{radd}, []*WalletTransaction{t})
+	err = p.d.WalletPersister().SaveWallet(ctx, []*Wallet{toWallet}, []*WalletRecord{radd}, []*WalletTransaction{t})
 	if err != nil {
 		return err
 	}
@@ -217,7 +224,7 @@ func (p *Manager) Lock(ctx context.Context, fromWalletID uuid.UUID, amount *big.
 	p.l.Lock()
 	defer p.l.Unlock()
 
-	fromWallet, err := p.d.WalletPersister.FindWalletByID(ctx, fromWalletID)
+	fromWallet, err := p.d.WalletPersister().FindWalletByID(ctx, fromWalletID)
 	if err != nil {
 		return err
 	}
@@ -230,7 +237,7 @@ func (p *Manager) Lock(ctx context.Context, fromWalletID uuid.UUID, amount *big.
 		return err
 	}
 
-	err = p.d.WalletPersister.SaveWallet(ctx, []*Wallet{fromWallet}, []*WalletRecord{rlock}, []*WalletTransaction{t})
+	err = p.d.WalletPersister().SaveWallet(ctx, []*Wallet{fromWallet}, []*WalletRecord{rlock}, []*WalletTransaction{t})
 	if err != nil {
 		return err
 	}
@@ -244,7 +251,7 @@ func (p *Manager) Unlock(ctx context.Context, fromWalletID uuid.UUID, amount *bi
 	p.l.Lock()
 	defer p.l.Unlock()
 
-	fromWallet, err := p.d.WalletPersister.FindWalletByID(ctx, fromWalletID)
+	fromWallet, err := p.d.WalletPersister().FindWalletByID(ctx, fromWalletID)
 	if err != nil {
 		return err
 	}
@@ -257,7 +264,7 @@ func (p *Manager) Unlock(ctx context.Context, fromWalletID uuid.UUID, amount *bi
 		return err
 	}
 
-	err = p.d.WalletPersister.SaveWallet(ctx, []*Wallet{fromWallet}, []*WalletRecord{runlock}, []*WalletTransaction{t})
+	err = p.d.WalletPersister().SaveWallet(ctx, []*Wallet{fromWallet}, []*WalletRecord{runlock}, []*WalletTransaction{t})
 	if err != nil {
 		return err
 	}
@@ -273,7 +280,7 @@ func (p *Manager) MintAndLock(ctx context.Context, toWalletID uuid.UUID, amount 
 	p.l.Lock()
 	defer p.l.Unlock()
 
-	toWallet, err := p.d.WalletPersister.FindWalletByID(ctx, toWalletID)
+	toWallet, err := p.d.WalletPersister().FindWalletByID(ctx, toWalletID)
 	if err != nil {
 		return err
 	}
@@ -287,7 +294,7 @@ func (p *Manager) MintAndLock(ctx context.Context, toWalletID uuid.UUID, amount 
 		return err
 	}
 
-	err = p.d.WalletPersister.SaveWallet(ctx, []*Wallet{toWallet}, []*WalletRecord{radd, rlock}, []*WalletTransaction{t})
+	err = p.d.WalletPersister().SaveWallet(ctx, []*Wallet{toWallet}, []*WalletRecord{radd, rlock}, []*WalletTransaction{t})
 	if err != nil {
 		return err
 	}
@@ -303,7 +310,7 @@ func (p *Manager) UnlockAndBurn(ctx context.Context, fromWalletID uuid.UUID, amo
 	p.l.Lock()
 	defer p.l.Unlock()
 
-	fromWallet, err := p.d.WalletPersister.FindWalletByID(ctx, fromWalletID)
+	fromWallet, err := p.d.WalletPersister().FindWalletByID(ctx, fromWalletID)
 	if err != nil {
 		return err
 	}
@@ -318,7 +325,7 @@ func (p *Manager) UnlockAndBurn(ctx context.Context, fromWalletID uuid.UUID, amo
 		return err
 	}
 
-	err = p.d.WalletPersister.SaveWallet(ctx, []*Wallet{fromWallet}, []*WalletRecord{runlock, rsub}, []*WalletTransaction{t})
+	err = p.d.WalletPersister().SaveWallet(ctx, []*Wallet{fromWallet}, []*WalletRecord{runlock, rsub}, []*WalletTransaction{t})
 	if err != nil {
 		return err
 	}
@@ -338,12 +345,12 @@ func (p *Manager) Trade(ctx context.Context,
 	p.l.Lock()
 	defer p.l.Unlock()
 
-	fromWallet, err := p.d.WalletPersister.FindWalletByID(ctx, fromWalletID)
+	fromWallet, err := p.d.WalletPersister().FindWalletByID(ctx, fromWalletID)
 	if err != nil {
 		return err
 	}
 
-	toWallet, err := p.d.WalletPersister.FindWalletByID(ctx, toWalletID)
+	toWallet, err := p.d.WalletPersister().FindWalletByID(ctx, toWalletID)
 	if err != nil {
 		return err
 	}
@@ -362,10 +369,35 @@ func (p *Manager) Trade(ctx context.Context,
 		return err
 	}
 
-	err = p.d.WalletPersister.SaveWallet(ctx, []*Wallet{fromWallet}, t.WalletRecords, []*WalletTransaction{t})
+	err = p.d.WalletPersister().SaveWallet(ctx, []*Wallet{fromWallet}, t.WalletRecords, []*WalletTransaction{t})
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (p *Manager) WalletByID(ctx context.Context, walletID uuid.UUID) (*Wallet, error) {
+	return p.d.WalletPersister().FindWalletByID(ctx, walletID)
+}
+
+func (p *Manager) WalletRecordsByID(ctx context.Context, walletID uuid.UUID) ([]*WalletRecord, error) {
+	return p.d.WalletPersister().FindWalletRecords(ctx, walletID)
+}
+
+func (p *Manager) CreateWallet(ctx context.Context, id *uuid.UUID) (*Wallet, error) {
+	wallet := &Wallet{
+		ID:            uuid.NewV4(),
+		Balance:       make(map[WalletCurrency]*big.Int),
+		LockedBalance: make(map[WalletCurrency]*big.Int),
+		Version:       uuid.NewV4(),
+	}
+
+	if id != nil {
+		wallet.ID = *id
+	}
+
+	err := p.d.WalletPersister().SaveWallet(ctx, []*Wallet{wallet}, nil, nil)
+
+	return wallet, err
 }

@@ -1,0 +1,356 @@
+basePath: /api
+definitions:
+  big.Int:
+    type: object
+  wallet.AmountModel:
+    properties:
+      amount:
+        type: integer
+      currency:
+        type: string
+    type: object
+  wallet.CreateWalletModel:
+    properties:
+      balance:
+        additionalProperties:
+          type: integer
+        type: object
+      createdAt:
+        type: string
+      id:
+        type: string
+      lockedBalance:
+        additionalProperties:
+          type: integer
+        type: object
+      updatedAt:
+        type: string
+      version:
+        type: string
+    type: object
+  wallet.TransferModel:
+    properties:
+      amount:
+        type: integer
+      currency:
+        type: string
+      fromWalletID:
+        type: string
+      toWalletID:
+        type: string
+    type: object
+  wallet.Wallet:
+    properties:
+      balance:
+        additionalProperties:
+          $ref: '#/definitions/big.Int'
+        type: object
+      createdAt:
+        type: string
+      id:
+        type: string
+      lockedBalance:
+        additionalProperties:
+          $ref: '#/definitions/big.Int'
+        type: object
+      updatedAt:
+        type: string
+      version:
+        type: string
+    type: object
+  wallet.WalletRecord:
+    properties:
+      createdAt:
+        type: string
+      currency:
+        type: string
+      id:
+        type: string
+      kind:
+        $ref: '#/definitions/wallet.WalletRecordKind'
+      value:
+        $ref: '#/definitions/big.Int'
+      wallet:
+        $ref: '#/definitions/wallet.Wallet'
+      walletID:
+        type: string
+    type: object
+  wallet.WalletRecordKind:
+    enum:
+    - 1
+    - 2
+    - 3
+    - 4
+    type: integer
+    x-enum-varnames:
+    - Sum
+    - Sub
+    - Lock
+    - Unlock
+  wallet.WalletUint64:
+    properties:
+      balance:
+        additionalProperties:
+          type: integer
+        type: object
+      createdAt:
+        type: string
+      id:
+        type: string
+      lockedBalance:
+        additionalProperties:
+          type: integer
+        type: object
+      updatedAt:
+        type: string
+      version:
+        type: string
+    type: object
+host: localhost:8091
+info:
+  contact:
+    email: contato@fourengine.com.br
+    name: 4 Engine Inc
+    url: https://fourengine.com/
+  description: Pelucio backend http endpoints
+  title: Pelucio backend API
+  version: "1.0"
+paths:
+  /v1/admin/wallet:
+    post:
+      consumes:
+      - application/json
+      description: create a wallet
+      parameters:
+      - description: Create wallet model
+        in: body
+        name: model
+        required: true
+        schema:
+          $ref: '#/definitions/wallet.CreateWalletModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: wallet
+          schema:
+            $ref: '#/definitions/wallet.WalletUint64'
+        "400":
+          description: Bad Request
+      summary: Create a wallet
+      tags:
+      - wallet
+  /v1/admin/wallet/{id}/burn:
+    post:
+      consumes:
+      - application/json
+      description: burn funds from one wallet
+      parameters:
+      - description: Wallet id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Amount model
+        in: body
+        name: model
+        required: true
+        schema:
+          $ref: '#/definitions/wallet.AmountModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Burn Transaction
+      tags:
+      - wallet
+  /v1/admin/wallet/{id}/lock:
+    post:
+      consumes:
+      - application/json
+      description: lock funds from one wallet
+      parameters:
+      - description: Wallet id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Amount model
+        in: body
+        name: model
+        required: true
+        schema:
+          $ref: '#/definitions/wallet.AmountModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Lock Transaction
+      tags:
+      - wallet
+  /v1/admin/wallet/{id}/mint:
+    post:
+      consumes:
+      - application/json
+      description: mint funds from one wallet
+      parameters:
+      - description: Wallet id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Amount model
+        in: body
+        name: model
+        required: true
+        schema:
+          $ref: '#/definitions/wallet.AmountModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Mint Transaction
+      tags:
+      - wallet
+  /v1/admin/wallet/{id}/mintandlock:
+    post:
+      consumes:
+      - application/json
+      description: unlock funds and burn that same funds from one wallet
+      parameters:
+      - description: Wallet id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Amount model
+        in: body
+        name: model
+        required: true
+        schema:
+          $ref: '#/definitions/wallet.AmountModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Unlock and burn Transaction
+      tags:
+      - wallet
+  /v1/admin/wallet/{id}/unlock:
+    post:
+      consumes:
+      - application/json
+      description: unlock funds from one wallet
+      parameters:
+      - description: Wallet id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Amount model
+        in: body
+        name: model
+        required: true
+        schema:
+          $ref: '#/definitions/wallet.AmountModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Unlock Transaction
+      tags:
+      - wallet
+  /v1/open/wallet/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get wallet infos by ID
+      parameters:
+      - description: Wallet id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: wallet
+          schema:
+            $ref: '#/definitions/wallet.WalletUint64'
+        "400":
+          description: Bad Request
+      summary: Get Wallet
+      tags:
+      - wallet
+  /v1/open/wallet/{id}/records:
+    get:
+      consumes:
+      - application/json
+      description: Get wallet records infos by ID
+      parameters:
+      - description: Wallet id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: wallet records
+          schema:
+            items:
+              $ref: '#/definitions/wallet.WalletRecord'
+            type: array
+        "400":
+          description: Bad Request
+      summary: Get Wallet records
+      tags:
+      - wallet
+  /v1/open/wallet/transfer:
+    post:
+      consumes:
+      - application/json
+      description: transfer funds from one wallet to another
+      parameters:
+      - description: Wallet id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Transfer data
+        in: body
+        name: model
+        required: true
+        schema:
+          $ref: '#/definitions/wallet.TransferModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Transfer Transaction
+      tags:
+      - wallet
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
