@@ -381,6 +381,10 @@ func (p *Manager) WalletByID(ctx context.Context, walletID uuid.UUID) (*Wallet, 
 	return p.d.WalletPersister().FindWalletByID(ctx, walletID)
 }
 
+func (p *Manager) WalletByExternalID(ctx context.Context, externalID string) (*Wallet, error) {
+	return p.d.WalletPersister().FindWalletByExternalID(ctx, externalID)
+}
+
 func (p *Manager) WalletRecordsByID(ctx context.Context, walletID uuid.UUID) ([]*WalletRecord, error) {
 	return p.d.WalletPersister().FindWalletRecords(ctx, walletID)
 }

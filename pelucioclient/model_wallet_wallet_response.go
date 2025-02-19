@@ -15,39 +15,39 @@ import (
 	"encoding/json"
 )
 
-// checks if the WalletCreateWalletModel type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &WalletCreateWalletModel{}
+// checks if the WalletWalletResponse type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &WalletWalletResponse{}
 
-// WalletCreateWalletModel struct for WalletCreateWalletModel
-type WalletCreateWalletModel struct {
+// WalletWalletResponse struct for WalletWalletResponse
+type WalletWalletResponse struct {
 	Balance *map[string]string `json:"balance,omitempty"`
 	CreatedAt *string `json:"createdAt,omitempty"`
-	ExternalID *string `json:"externalID,omitempty"`
+	ExternalId *string `json:"external_id,omitempty"`
 	Id *string `json:"id,omitempty"`
 	LockedBalance *map[string]string `json:"lockedBalance,omitempty"`
 	UpdatedAt *string `json:"updatedAt,omitempty"`
 	Version *string `json:"version,omitempty"`
 }
 
-// NewWalletCreateWalletModel instantiates a new WalletCreateWalletModel object
+// NewWalletWalletResponse instantiates a new WalletWalletResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWalletCreateWalletModel() *WalletCreateWalletModel {
-	this := WalletCreateWalletModel{}
+func NewWalletWalletResponse() *WalletWalletResponse {
+	this := WalletWalletResponse{}
 	return &this
 }
 
-// NewWalletCreateWalletModelWithDefaults instantiates a new WalletCreateWalletModel object
+// NewWalletWalletResponseWithDefaults instantiates a new WalletWalletResponse object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewWalletCreateWalletModelWithDefaults() *WalletCreateWalletModel {
-	this := WalletCreateWalletModel{}
+func NewWalletWalletResponseWithDefaults() *WalletWalletResponse {
+	this := WalletWalletResponse{}
 	return &this
 }
 
 // GetBalance returns the Balance field value if set, zero value otherwise.
-func (o *WalletCreateWalletModel) GetBalance() map[string]string {
+func (o *WalletWalletResponse) GetBalance() map[string]string {
 	if o == nil || IsNil(o.Balance) {
 		var ret map[string]string
 		return ret
@@ -57,7 +57,7 @@ func (o *WalletCreateWalletModel) GetBalance() map[string]string {
 
 // GetBalanceOk returns a tuple with the Balance field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WalletCreateWalletModel) GetBalanceOk() (*map[string]string, bool) {
+func (o *WalletWalletResponse) GetBalanceOk() (*map[string]string, bool) {
 	if o == nil || IsNil(o.Balance) {
 		return nil, false
 	}
@@ -65,7 +65,7 @@ func (o *WalletCreateWalletModel) GetBalanceOk() (*map[string]string, bool) {
 }
 
 // HasBalance returns a boolean if a field has been set.
-func (o *WalletCreateWalletModel) HasBalance() bool {
+func (o *WalletWalletResponse) HasBalance() bool {
 	if o != nil && !IsNil(o.Balance) {
 		return true
 	}
@@ -74,12 +74,12 @@ func (o *WalletCreateWalletModel) HasBalance() bool {
 }
 
 // SetBalance gets a reference to the given map[string]string and assigns it to the Balance field.
-func (o *WalletCreateWalletModel) SetBalance(v map[string]string) {
+func (o *WalletWalletResponse) SetBalance(v map[string]string) {
 	o.Balance = &v
 }
 
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
-func (o *WalletCreateWalletModel) GetCreatedAt() string {
+func (o *WalletWalletResponse) GetCreatedAt() string {
 	if o == nil || IsNil(o.CreatedAt) {
 		var ret string
 		return ret
@@ -89,7 +89,7 @@ func (o *WalletCreateWalletModel) GetCreatedAt() string {
 
 // GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WalletCreateWalletModel) GetCreatedAtOk() (*string, bool) {
+func (o *WalletWalletResponse) GetCreatedAtOk() (*string, bool) {
 	if o == nil || IsNil(o.CreatedAt) {
 		return nil, false
 	}
@@ -97,7 +97,7 @@ func (o *WalletCreateWalletModel) GetCreatedAtOk() (*string, bool) {
 }
 
 // HasCreatedAt returns a boolean if a field has been set.
-func (o *WalletCreateWalletModel) HasCreatedAt() bool {
+func (o *WalletWalletResponse) HasCreatedAt() bool {
 	if o != nil && !IsNil(o.CreatedAt) {
 		return true
 	}
@@ -106,44 +106,44 @@ func (o *WalletCreateWalletModel) HasCreatedAt() bool {
 }
 
 // SetCreatedAt gets a reference to the given string and assigns it to the CreatedAt field.
-func (o *WalletCreateWalletModel) SetCreatedAt(v string) {
+func (o *WalletWalletResponse) SetCreatedAt(v string) {
 	o.CreatedAt = &v
 }
 
-// GetExternalID returns the ExternalID field value if set, zero value otherwise.
-func (o *WalletCreateWalletModel) GetExternalID() string {
-	if o == nil || IsNil(o.ExternalID) {
+// GetExternalId returns the ExternalId field value if set, zero value otherwise.
+func (o *WalletWalletResponse) GetExternalId() string {
+	if o == nil || IsNil(o.ExternalId) {
 		var ret string
 		return ret
 	}
-	return *o.ExternalID
+	return *o.ExternalId
 }
 
-// GetExternalIDOk returns a tuple with the ExternalID field value if set, nil otherwise
+// GetExternalIdOk returns a tuple with the ExternalId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WalletCreateWalletModel) GetExternalIDOk() (*string, bool) {
-	if o == nil || IsNil(o.ExternalID) {
+func (o *WalletWalletResponse) GetExternalIdOk() (*string, bool) {
+	if o == nil || IsNil(o.ExternalId) {
 		return nil, false
 	}
-	return o.ExternalID, true
+	return o.ExternalId, true
 }
 
-// HasExternalID returns a boolean if a field has been set.
-func (o *WalletCreateWalletModel) HasExternalID() bool {
-	if o != nil && !IsNil(o.ExternalID) {
+// HasExternalId returns a boolean if a field has been set.
+func (o *WalletWalletResponse) HasExternalId() bool {
+	if o != nil && !IsNil(o.ExternalId) {
 		return true
 	}
 
 	return false
 }
 
-// SetExternalID gets a reference to the given string and assigns it to the ExternalID field.
-func (o *WalletCreateWalletModel) SetExternalID(v string) {
-	o.ExternalID = &v
+// SetExternalId gets a reference to the given string and assigns it to the ExternalId field.
+func (o *WalletWalletResponse) SetExternalId(v string) {
+	o.ExternalId = &v
 }
 
 // GetId returns the Id field value if set, zero value otherwise.
-func (o *WalletCreateWalletModel) GetId() string {
+func (o *WalletWalletResponse) GetId() string {
 	if o == nil || IsNil(o.Id) {
 		var ret string
 		return ret
@@ -153,7 +153,7 @@ func (o *WalletCreateWalletModel) GetId() string {
 
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WalletCreateWalletModel) GetIdOk() (*string, bool) {
+func (o *WalletWalletResponse) GetIdOk() (*string, bool) {
 	if o == nil || IsNil(o.Id) {
 		return nil, false
 	}
@@ -161,7 +161,7 @@ func (o *WalletCreateWalletModel) GetIdOk() (*string, bool) {
 }
 
 // HasId returns a boolean if a field has been set.
-func (o *WalletCreateWalletModel) HasId() bool {
+func (o *WalletWalletResponse) HasId() bool {
 	if o != nil && !IsNil(o.Id) {
 		return true
 	}
@@ -170,12 +170,12 @@ func (o *WalletCreateWalletModel) HasId() bool {
 }
 
 // SetId gets a reference to the given string and assigns it to the Id field.
-func (o *WalletCreateWalletModel) SetId(v string) {
+func (o *WalletWalletResponse) SetId(v string) {
 	o.Id = &v
 }
 
 // GetLockedBalance returns the LockedBalance field value if set, zero value otherwise.
-func (o *WalletCreateWalletModel) GetLockedBalance() map[string]string {
+func (o *WalletWalletResponse) GetLockedBalance() map[string]string {
 	if o == nil || IsNil(o.LockedBalance) {
 		var ret map[string]string
 		return ret
@@ -185,7 +185,7 @@ func (o *WalletCreateWalletModel) GetLockedBalance() map[string]string {
 
 // GetLockedBalanceOk returns a tuple with the LockedBalance field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WalletCreateWalletModel) GetLockedBalanceOk() (*map[string]string, bool) {
+func (o *WalletWalletResponse) GetLockedBalanceOk() (*map[string]string, bool) {
 	if o == nil || IsNil(o.LockedBalance) {
 		return nil, false
 	}
@@ -193,7 +193,7 @@ func (o *WalletCreateWalletModel) GetLockedBalanceOk() (*map[string]string, bool
 }
 
 // HasLockedBalance returns a boolean if a field has been set.
-func (o *WalletCreateWalletModel) HasLockedBalance() bool {
+func (o *WalletWalletResponse) HasLockedBalance() bool {
 	if o != nil && !IsNil(o.LockedBalance) {
 		return true
 	}
@@ -202,12 +202,12 @@ func (o *WalletCreateWalletModel) HasLockedBalance() bool {
 }
 
 // SetLockedBalance gets a reference to the given map[string]string and assigns it to the LockedBalance field.
-func (o *WalletCreateWalletModel) SetLockedBalance(v map[string]string) {
+func (o *WalletWalletResponse) SetLockedBalance(v map[string]string) {
 	o.LockedBalance = &v
 }
 
 // GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise.
-func (o *WalletCreateWalletModel) GetUpdatedAt() string {
+func (o *WalletWalletResponse) GetUpdatedAt() string {
 	if o == nil || IsNil(o.UpdatedAt) {
 		var ret string
 		return ret
@@ -217,7 +217,7 @@ func (o *WalletCreateWalletModel) GetUpdatedAt() string {
 
 // GetUpdatedAtOk returns a tuple with the UpdatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WalletCreateWalletModel) GetUpdatedAtOk() (*string, bool) {
+func (o *WalletWalletResponse) GetUpdatedAtOk() (*string, bool) {
 	if o == nil || IsNil(o.UpdatedAt) {
 		return nil, false
 	}
@@ -225,7 +225,7 @@ func (o *WalletCreateWalletModel) GetUpdatedAtOk() (*string, bool) {
 }
 
 // HasUpdatedAt returns a boolean if a field has been set.
-func (o *WalletCreateWalletModel) HasUpdatedAt() bool {
+func (o *WalletWalletResponse) HasUpdatedAt() bool {
 	if o != nil && !IsNil(o.UpdatedAt) {
 		return true
 	}
@@ -234,12 +234,12 @@ func (o *WalletCreateWalletModel) HasUpdatedAt() bool {
 }
 
 // SetUpdatedAt gets a reference to the given string and assigns it to the UpdatedAt field.
-func (o *WalletCreateWalletModel) SetUpdatedAt(v string) {
+func (o *WalletWalletResponse) SetUpdatedAt(v string) {
 	o.UpdatedAt = &v
 }
 
 // GetVersion returns the Version field value if set, zero value otherwise.
-func (o *WalletCreateWalletModel) GetVersion() string {
+func (o *WalletWalletResponse) GetVersion() string {
 	if o == nil || IsNil(o.Version) {
 		var ret string
 		return ret
@@ -249,7 +249,7 @@ func (o *WalletCreateWalletModel) GetVersion() string {
 
 // GetVersionOk returns a tuple with the Version field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WalletCreateWalletModel) GetVersionOk() (*string, bool) {
+func (o *WalletWalletResponse) GetVersionOk() (*string, bool) {
 	if o == nil || IsNil(o.Version) {
 		return nil, false
 	}
@@ -257,7 +257,7 @@ func (o *WalletCreateWalletModel) GetVersionOk() (*string, bool) {
 }
 
 // HasVersion returns a boolean if a field has been set.
-func (o *WalletCreateWalletModel) HasVersion() bool {
+func (o *WalletWalletResponse) HasVersion() bool {
 	if o != nil && !IsNil(o.Version) {
 		return true
 	}
@@ -266,11 +266,11 @@ func (o *WalletCreateWalletModel) HasVersion() bool {
 }
 
 // SetVersion gets a reference to the given string and assigns it to the Version field.
-func (o *WalletCreateWalletModel) SetVersion(v string) {
+func (o *WalletWalletResponse) SetVersion(v string) {
 	o.Version = &v
 }
 
-func (o WalletCreateWalletModel) MarshalJSON() ([]byte, error) {
+func (o WalletWalletResponse) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -278,7 +278,7 @@ func (o WalletCreateWalletModel) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o WalletCreateWalletModel) ToMap() (map[string]interface{}, error) {
+func (o WalletWalletResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.Balance) {
 		toSerialize["balance"] = o.Balance
@@ -286,8 +286,8 @@ func (o WalletCreateWalletModel) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.CreatedAt) {
 		toSerialize["createdAt"] = o.CreatedAt
 	}
-	if !IsNil(o.ExternalID) {
-		toSerialize["externalID"] = o.ExternalID
+	if !IsNil(o.ExternalId) {
+		toSerialize["external_id"] = o.ExternalId
 	}
 	if !IsNil(o.Id) {
 		toSerialize["id"] = o.Id
@@ -304,38 +304,38 @@ func (o WalletCreateWalletModel) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-type NullableWalletCreateWalletModel struct {
-	value *WalletCreateWalletModel
+type NullableWalletWalletResponse struct {
+	value *WalletWalletResponse
 	isSet bool
 }
 
-func (v NullableWalletCreateWalletModel) Get() *WalletCreateWalletModel {
+func (v NullableWalletWalletResponse) Get() *WalletWalletResponse {
 	return v.value
 }
 
-func (v *NullableWalletCreateWalletModel) Set(val *WalletCreateWalletModel) {
+func (v *NullableWalletWalletResponse) Set(val *WalletWalletResponse) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableWalletCreateWalletModel) IsSet() bool {
+func (v NullableWalletWalletResponse) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableWalletCreateWalletModel) Unset() {
+func (v *NullableWalletWalletResponse) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableWalletCreateWalletModel(val *WalletCreateWalletModel) *NullableWalletCreateWalletModel {
-	return &NullableWalletCreateWalletModel{value: val, isSet: true}
+func NewNullableWalletWalletResponse(val *WalletWalletResponse) *NullableWalletWalletResponse {
+	return &NullableWalletWalletResponse{value: val, isSet: true}
 }
 
-func (v NullableWalletCreateWalletModel) MarshalJSON() ([]byte, error) {
+func (v NullableWalletWalletResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableWalletCreateWalletModel) UnmarshalJSON(src []byte) error {
+func (v *NullableWalletWalletResponse) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

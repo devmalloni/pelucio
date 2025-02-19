@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Amount** | Pointer to **int32** |  | [optional] 
+**Amount** | Pointer to **string** |  | [optional] 
 **Currency** | Pointer to **string** |  | [optional] 
 **FromWalletID** | Pointer to **string** |  | [optional] 
 **ToWalletID** | Pointer to **string** |  | [optional] 
@@ -30,20 +30,20 @@ but it doesn't guarantee that properties required by API are set
 
 ### GetAmount
 
-`func (o *WalletTransferModel) GetAmount() int32`
+`func (o *WalletTransferModel) GetAmount() string`
 
 GetAmount returns the Amount field if non-nil, zero value otherwise.
 
 ### GetAmountOk
 
-`func (o *WalletTransferModel) GetAmountOk() (*int32, bool)`
+`func (o *WalletTransferModel) GetAmountOk() (*string, bool)`
 
 GetAmountOk returns a tuple with the Amount field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetAmount
 
-`func (o *WalletTransferModel) SetAmount(v int32)`
+`func (o *WalletTransferModel) SetAmount(v string)`
 
 SetAmount sets Amount field to given value.
 

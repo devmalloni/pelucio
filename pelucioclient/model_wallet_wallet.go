@@ -22,6 +22,7 @@ var _ MappedNullable = &WalletWallet{}
 type WalletWallet struct {
 	Balance *map[string]map[string]interface{} `json:"balance,omitempty"`
 	CreatedAt *string `json:"createdAt,omitempty"`
+	ExternalId *string `json:"external_id,omitempty"`
 	Id *string `json:"id,omitempty"`
 	LockedBalance *map[string]map[string]interface{} `json:"lockedBalance,omitempty"`
 	UpdatedAt *string `json:"updatedAt,omitempty"`
@@ -107,6 +108,38 @@ func (o *WalletWallet) HasCreatedAt() bool {
 // SetCreatedAt gets a reference to the given string and assigns it to the CreatedAt field.
 func (o *WalletWallet) SetCreatedAt(v string) {
 	o.CreatedAt = &v
+}
+
+// GetExternalId returns the ExternalId field value if set, zero value otherwise.
+func (o *WalletWallet) GetExternalId() string {
+	if o == nil || IsNil(o.ExternalId) {
+		var ret string
+		return ret
+	}
+	return *o.ExternalId
+}
+
+// GetExternalIdOk returns a tuple with the ExternalId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WalletWallet) GetExternalIdOk() (*string, bool) {
+	if o == nil || IsNil(o.ExternalId) {
+		return nil, false
+	}
+	return o.ExternalId, true
+}
+
+// HasExternalId returns a boolean if a field has been set.
+func (o *WalletWallet) HasExternalId() bool {
+	if o != nil && !IsNil(o.ExternalId) {
+		return true
+	}
+
+	return false
+}
+
+// SetExternalId gets a reference to the given string and assigns it to the ExternalId field.
+func (o *WalletWallet) SetExternalId(v string) {
+	o.ExternalId = &v
 }
 
 // GetId returns the Id field value if set, zero value otherwise.
@@ -252,6 +285,9 @@ func (o WalletWallet) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.CreatedAt) {
 		toSerialize["createdAt"] = o.CreatedAt
+	}
+	if !IsNil(o.ExternalId) {
+		toSerialize["external_id"] = o.ExternalId
 	}
 	if !IsNil(o.Id) {
 		toSerialize["id"] = o.Id

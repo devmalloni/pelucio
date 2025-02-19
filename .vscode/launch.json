@@ -18,5 +18,18 @@
                 "PELUCIO_HTTPPORT": ":8091",
             }
         },
+        {
+            "name": "migrate",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "args": [
+                "migrate"
+            ],
+            "env": {
+                "PELUCIO_PATH": "my.db",
+            }
+        },
     ]
 }

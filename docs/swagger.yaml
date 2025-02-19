@@ -5,7 +5,7 @@ definitions:
   wallet.AmountModel:
     properties:
       amount:
-        type: integer
+        type: string
       currency:
         type: string
     type: object
@@ -13,15 +13,17 @@ definitions:
     properties:
       balance:
         additionalProperties:
-          type: integer
+          type: string
         type: object
       createdAt:
+        type: string
+      externalID:
         type: string
       id:
         type: string
       lockedBalance:
         additionalProperties:
-          type: integer
+          type: string
         type: object
       updatedAt:
         type: string
@@ -31,7 +33,7 @@ definitions:
   wallet.TransferModel:
     properties:
       amount:
-        type: integer
+        type: string
       currency:
         type: string
       fromWalletID:
@@ -46,6 +48,8 @@ definitions:
           $ref: '#/definitions/big.Int'
         type: object
       createdAt:
+        type: string
+      external_id:
         type: string
       id:
         type: string
@@ -87,19 +91,21 @@ definitions:
     - Sub
     - Lock
     - Unlock
-  wallet.WalletUint64:
+  wallet.WalletResponse:
     properties:
       balance:
         additionalProperties:
-          type: integer
+          type: string
         type: object
       createdAt:
+        type: string
+      external_id:
         type: string
       id:
         type: string
       lockedBalance:
         additionalProperties:
-          type: integer
+          type: string
         type: object
       updatedAt:
         type: string
@@ -134,7 +140,7 @@ paths:
         "200":
           description: wallet
           schema:
-            $ref: '#/definitions/wallet.WalletUint64'
+            $ref: '#/definitions/wallet.WalletResponse'
         "400":
           description: Bad Request
       summary: Create a wallet
@@ -292,7 +298,7 @@ paths:
         "200":
           description: wallet
           schema:
-            $ref: '#/definitions/wallet.WalletUint64'
+            $ref: '#/definitions/wallet.WalletResponse'
         "400":
           description: Bad Request
       summary: Get Wallet
@@ -323,17 +329,35 @@ paths:
       summary: Get Wallet records
       tags:
       - wallet
+  /v1/open/wallet/external/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get wallet infos by ExternalID
+      parameters:
+      - description: External id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: wallet
+          schema:
+            $ref: '#/definitions/wallet.WalletResponse'
+        "400":
+          description: Bad Request
+      summary: Get Wallet by externalID
+      tags:
+      - wallet
   /v1/open/wallet/transfer:
     post:
       consumes:
       - application/json
       description: transfer funds from one wallet to another
       parameters:
-      - description: Wallet id
-        in: path
-        name: id
-        required: true
-        type: string
       - description: Transfer data
         in: body
         name: model

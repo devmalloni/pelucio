@@ -25,7 +25,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/wallet.WalletUint64'
+                $ref: '#/components/schemas/wallet.WalletResponse'
           description: wallet
         "400":
           content: {}
@@ -189,7 +189,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/wallet.WalletUint64'
+                $ref: '#/components/schemas/wallet.WalletResponse'
           description: wallet
         "400":
           content: {}
@@ -222,16 +222,32 @@ paths:
       summary: Get Wallet records
       tags:
       - wallet
-  /v1/open/wallet/transfer:
-    post:
-      description: transfer funds from one wallet to another
+  /v1/open/wallet/external/{id}:
+    get:
+      description: Get wallet infos by ExternalID
       parameters:
-      - description: Wallet id
+      - description: External id
         in: path
         name: id
         required: true
         schema:
           type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/wallet.WalletResponse'
+          description: wallet
+        "400":
+          content: {}
+          description: Bad Request
+      summary: Get Wallet by externalID
+      tags:
+      - wallet
+  /v1/open/wallet/transfer:
+    post:
+      description: transfer funds from one wallet to another
       requestBody:
         content:
           application/json:
@@ -257,7 +273,7 @@ components:
     wallet.AmountModel:
       properties:
         amount:
-          type: integer
+          type: string
         currency:
           type: string
       type: object
@@ -265,15 +281,17 @@ components:
       properties:
         balance:
           additionalProperties:
-            type: integer
+            type: string
           type: object
         createdAt:
+          type: string
+        externalID:
           type: string
         id:
           type: string
         lockedBalance:
           additionalProperties:
-            type: integer
+            type: string
           type: object
         updatedAt:
           type: string
@@ -283,7 +301,7 @@ components:
     wallet.TransferModel:
       properties:
         amount:
-          type: integer
+          type: string
         currency:
           type: string
         fromWalletID:
@@ -298,6 +316,7 @@ components:
           key: null
         lockedBalance:
           key: null
+        external_id: external_id
         id: id
         version: version
         updatedAt: updatedAt
@@ -307,6 +326,8 @@ components:
             $ref: '#/components/schemas/big.Int'
           type: object
         createdAt:
+          type: string
+        external_id:
           type: string
         id:
           type: string
@@ -329,6 +350,7 @@ components:
             key: null
           lockedBalance:
             key: null
+          external_id: external_id
           id: id
           version: version
           updatedAt: updatedAt
@@ -364,28 +386,31 @@ components:
       - Sub
       - Lock
       - Unlock
-    wallet.WalletUint64:
+    wallet.WalletResponse:
       example:
         createdAt: createdAt
         balance:
-          key: 0
+          key: balance
         lockedBalance:
-          key: 6
+          key: lockedBalance
+        external_id: external_id
         id: id
         version: version
         updatedAt: updatedAt
       properties:
         balance:
           additionalProperties:
-            type: integer
+            type: string
           type: object
         createdAt:
+          type: string
+        external_id:
           type: string
         id:
           type: string
         lockedBalance:
           additionalProperties:
-            type: integer
+            type: string
           type: object
         updatedAt:
           type: string

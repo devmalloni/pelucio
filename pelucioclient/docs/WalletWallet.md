@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Balance** | Pointer to **map[string]map[string]interface{}** |  | [optional] 
 **CreatedAt** | Pointer to **string** |  | [optional] 
+**ExternalId** | Pointer to **string** |  | [optional] 
 **Id** | Pointer to **string** |  | [optional] 
 **LockedBalance** | Pointer to **map[string]map[string]interface{}** |  | [optional] 
 **UpdatedAt** | Pointer to **string** |  | [optional] 
@@ -79,6 +80,31 @@ SetCreatedAt sets CreatedAt field to given value.
 `func (o *WalletWallet) HasCreatedAt() bool`
 
 HasCreatedAt returns a boolean if a field has been set.
+
+### GetExternalId
+
+`func (o *WalletWallet) GetExternalId() string`
+
+GetExternalId returns the ExternalId field if non-nil, zero value otherwise.
+
+### GetExternalIdOk
+
+`func (o *WalletWallet) GetExternalIdOk() (*string, bool)`
+
+GetExternalIdOk returns a tuple with the ExternalId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetExternalId
+
+`func (o *WalletWallet) SetExternalId(v string)`
+
+SetExternalId sets ExternalId field to given value.
+
+### HasExternalId
+
+`func (o *WalletWallet) HasExternalId() bool`
+
+HasExternalId returns a boolean if a field has been set.
 
 ### GetId
 

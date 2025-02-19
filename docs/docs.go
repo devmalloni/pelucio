@@ -47,7 +47,7 @@ const docTemplate = `{
                     "200": {
                         "description": "wallet",
                         "schema": {
-                            "$ref": "#/definitions/wallet.WalletUint64"
+                            "$ref": "#/definitions/wallet.WalletResponse"
                         }
                     },
                     "400": {
@@ -261,6 +261,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/open/wallet/external/{id}": {
+            "get": {
+                "description": "Get wallet infos by ExternalID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wallet"
+                ],
+                "summary": "Get Wallet by externalID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "External id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "wallet",
+                        "schema": {
+                            "$ref": "#/definitions/wallet.WalletResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
         "/v1/open/wallet/transfer": {
             "post": {
                 "description": "transfer funds from one wallet to another",
@@ -275,13 +310,6 @@ const docTemplate = `{
                 ],
                 "summary": "Transfer Transaction",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Wallet id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "description": "Transfer data",
                         "name": "model",
@@ -328,7 +356,7 @@ const docTemplate = `{
                     "200": {
                         "description": "wallet",
                         "schema": {
-                            "$ref": "#/definitions/wallet.WalletUint64"
+                            "$ref": "#/definitions/wallet.WalletResponse"
                         }
                     },
                     "400": {
@@ -384,7 +412,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "amount": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "currency": {
                     "type": "string"
@@ -397,10 +425,13 @@ const docTemplate = `{
                 "balance": {
                     "type": "object",
                     "additionalProperties": {
-                        "type": "integer"
+                        "type": "string"
                     }
                 },
                 "createdAt": {
+                    "type": "string"
+                },
+                "externalID": {
                     "type": "string"
                 },
                 "id": {
@@ -409,7 +440,7 @@ const docTemplate = `{
                 "lockedBalance": {
                     "type": "object",
                     "additionalProperties": {
-                        "type": "integer"
+                        "type": "string"
                     }
                 },
                 "updatedAt": {
@@ -424,7 +455,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "amount": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "currency": {
                     "type": "string"
@@ -447,6 +478,9 @@ const docTemplate = `{
                     }
                 },
                 "createdAt": {
+                    "type": "string"
+                },
+                "external_id": {
                     "type": "string"
                 },
                 "id": {
@@ -507,16 +541,19 @@ const docTemplate = `{
                 "Unlock"
             ]
         },
-        "wallet.WalletUint64": {
+        "wallet.WalletResponse": {
             "type": "object",
             "properties": {
                 "balance": {
                     "type": "object",
                     "additionalProperties": {
-                        "type": "integer"
+                        "type": "string"
                     }
                 },
                 "createdAt": {
+                    "type": "string"
+                },
+                "external_id": {
                     "type": "string"
                 },
                 "id": {
@@ -525,7 +562,7 @@ const docTemplate = `{
                 "lockedBalance": {
                     "type": "object",
                     "additionalProperties": {
-                        "type": "integer"
+                        "type": "string"
                     }
                 },
                 "updatedAt": {

@@ -12,7 +12,7 @@ docs/WalletTransferModel.md
 docs/WalletWallet.md
 docs/WalletWalletRecord.md
 docs/WalletWalletRecordKind.md
-docs/WalletWalletUint64.md
+docs/WalletWalletResponse.md
 git_push.sh
 go.mod
 go.sum
@@ -22,7 +22,7 @@ model_wallet_transfer_model.go
 model_wallet_wallet.go
 model_wallet_wallet_record.go
 model_wallet_wallet_record_kind.go
-model_wallet_wallet_uint64.go
+model_wallet_wallet_response.go
 response.go
 test/api_wallet_test.go
 utils.go

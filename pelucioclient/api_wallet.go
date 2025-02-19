@@ -104,8 +104,23 @@ type WalletAPI interface {
 	V1AdminWalletPost(ctx context.Context) WalletAPIV1AdminWalletPostRequest
 
 	// V1AdminWalletPostExecute executes the request
-	//  @return WalletWalletUint64
-	V1AdminWalletPostExecute(r WalletAPIV1AdminWalletPostRequest) (*WalletWalletUint64, *http.Response, error)
+	//  @return WalletWalletResponse
+	V1AdminWalletPostExecute(r WalletAPIV1AdminWalletPostRequest) (*WalletWalletResponse, *http.Response, error)
+
+	/*
+	V1OpenWalletExternalIdGet Get Wallet by externalID
+
+	Get wallet infos by ExternalID
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param id External id
+	@return WalletAPIV1OpenWalletExternalIdGetRequest
+	*/
+	V1OpenWalletExternalIdGet(ctx context.Context, id string) WalletAPIV1OpenWalletExternalIdGetRequest
+
+	// V1OpenWalletExternalIdGetExecute executes the request
+	//  @return WalletWalletResponse
+	V1OpenWalletExternalIdGetExecute(r WalletAPIV1OpenWalletExternalIdGetRequest) (*WalletWalletResponse, *http.Response, error)
 
 	/*
 	V1OpenWalletIdGet Get Wallet
@@ -119,8 +134,8 @@ type WalletAPI interface {
 	V1OpenWalletIdGet(ctx context.Context, id string) WalletAPIV1OpenWalletIdGetRequest
 
 	// V1OpenWalletIdGetExecute executes the request
-	//  @return WalletWalletUint64
-	V1OpenWalletIdGetExecute(r WalletAPIV1OpenWalletIdGetRequest) (*WalletWalletUint64, *http.Response, error)
+	//  @return WalletWalletResponse
+	V1OpenWalletIdGetExecute(r WalletAPIV1OpenWalletIdGetRequest) (*WalletWalletResponse, *http.Response, error)
 
 	/*
 	V1OpenWalletIdRecordsGet Get Wallet records
@@ -143,10 +158,9 @@ type WalletAPI interface {
 	transfer funds from one wallet to another
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param id Wallet id
 	@return WalletAPIV1OpenWalletTransferPostRequest
 	*/
-	V1OpenWalletTransferPost(ctx context.Context, id string) WalletAPIV1OpenWalletTransferPostRequest
+	V1OpenWalletTransferPost(ctx context.Context) WalletAPIV1OpenWalletTransferPostRequest
 
 	// V1OpenWalletTransferPostExecute executes the request
 	V1OpenWalletTransferPostExecute(r WalletAPIV1OpenWalletTransferPostRequest) (*http.Response, error)
@@ -687,7 +701,7 @@ func (r WalletAPIV1AdminWalletPostRequest) Model(model WalletCreateWalletModel) 
 	return r
 }
 
-func (r WalletAPIV1AdminWalletPostRequest) Execute() (*WalletWalletUint64, *http.Response, error) {
+func (r WalletAPIV1AdminWalletPostRequest) Execute() (*WalletWalletResponse, *http.Response, error) {
 	return r.ApiService.V1AdminWalletPostExecute(r)
 }
 
@@ -707,13 +721,13 @@ func (a *WalletAPIService) V1AdminWalletPost(ctx context.Context) WalletAPIV1Adm
 }
 
 // Execute executes the request
-//  @return WalletWalletUint64
-func (a *WalletAPIService) V1AdminWalletPostExecute(r WalletAPIV1AdminWalletPostRequest) (*WalletWalletUint64, *http.Response, error) {
+//  @return WalletWalletResponse
+func (a *WalletAPIService) V1AdminWalletPostExecute(r WalletAPIV1AdminWalletPostRequest) (*WalletWalletResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *WalletWalletUint64
+		localVarReturnValue  *WalletWalletResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WalletAPIService.V1AdminWalletPost")
@@ -786,13 +800,116 @@ func (a *WalletAPIService) V1AdminWalletPostExecute(r WalletAPIV1AdminWalletPost
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type WalletAPIV1OpenWalletExternalIdGetRequest struct {
+	ctx context.Context
+	ApiService WalletAPI
+	id string
+}
+
+func (r WalletAPIV1OpenWalletExternalIdGetRequest) Execute() (*WalletWalletResponse, *http.Response, error) {
+	return r.ApiService.V1OpenWalletExternalIdGetExecute(r)
+}
+
+/*
+V1OpenWalletExternalIdGet Get Wallet by externalID
+
+Get wallet infos by ExternalID
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param id External id
+ @return WalletAPIV1OpenWalletExternalIdGetRequest
+*/
+func (a *WalletAPIService) V1OpenWalletExternalIdGet(ctx context.Context, id string) WalletAPIV1OpenWalletExternalIdGetRequest {
+	return WalletAPIV1OpenWalletExternalIdGetRequest{
+		ApiService: a,
+		ctx: ctx,
+		id: id,
+	}
+}
+
+// Execute executes the request
+//  @return WalletWalletResponse
+func (a *WalletAPIService) V1OpenWalletExternalIdGetExecute(r WalletAPIV1OpenWalletExternalIdGetRequest) (*WalletWalletResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *WalletWalletResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WalletAPIService.V1OpenWalletExternalIdGet")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/v1/open/wallet/external/{id}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type WalletAPIV1OpenWalletIdGetRequest struct {
 	ctx context.Context
 	ApiService WalletAPI
 	id string
 }
 
-func (r WalletAPIV1OpenWalletIdGetRequest) Execute() (*WalletWalletUint64, *http.Response, error) {
+func (r WalletAPIV1OpenWalletIdGetRequest) Execute() (*WalletWalletResponse, *http.Response, error) {
 	return r.ApiService.V1OpenWalletIdGetExecute(r)
 }
 
@@ -814,13 +931,13 @@ func (a *WalletAPIService) V1OpenWalletIdGet(ctx context.Context, id string) Wal
 }
 
 // Execute executes the request
-//  @return WalletWalletUint64
-func (a *WalletAPIService) V1OpenWalletIdGetExecute(r WalletAPIV1OpenWalletIdGetRequest) (*WalletWalletUint64, *http.Response, error) {
+//  @return WalletWalletResponse
+func (a *WalletAPIService) V1OpenWalletIdGetExecute(r WalletAPIV1OpenWalletIdGetRequest) (*WalletWalletResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *WalletWalletUint64
+		localVarReturnValue  *WalletWalletResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WalletAPIService.V1OpenWalletIdGet")
@@ -995,7 +1112,6 @@ func (a *WalletAPIService) V1OpenWalletIdRecordsGetExecute(r WalletAPIV1OpenWall
 type WalletAPIV1OpenWalletTransferPostRequest struct {
 	ctx context.Context
 	ApiService WalletAPI
-	id string
 	model *WalletTransferModel
 }
 
@@ -1015,14 +1131,12 @@ V1OpenWalletTransferPost Transfer Transaction
 transfer funds from one wallet to another
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id Wallet id
  @return WalletAPIV1OpenWalletTransferPostRequest
 */
-func (a *WalletAPIService) V1OpenWalletTransferPost(ctx context.Context, id string) WalletAPIV1OpenWalletTransferPostRequest {
+func (a *WalletAPIService) V1OpenWalletTransferPost(ctx context.Context) WalletAPIV1OpenWalletTransferPostRequest {
 	return WalletAPIV1OpenWalletTransferPostRequest{
 		ApiService: a,
 		ctx: ctx,
-		id: id,
 	}
 }
 
@@ -1040,7 +1154,6 @@ func (a *WalletAPIService) V1OpenWalletTransferPostExecute(r WalletAPIV1OpenWall
 	}
 
 	localVarPath := localBasePath + "/v1/open/wallet/transfer"
-	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

@@ -11,6 +11,12 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
+var (
+	ErrNotFound       = xerrors.New("ErrNotFound")
+	ErrWalletNotFound = xerrors.New("ErrWalletNotFound")
+	ErrBadRequest     = xerrors.New("ErrBadRequest")
+)
+
 type (
 	handlerDependencies interface {
 		ManagerProvider
@@ -21,18 +27,18 @@ type (
 	TransferModel struct {
 		FromWalletID uuid.UUID
 		ToWalletID   uuid.UUID
-		Amount       *uint64
+		Amount       *string
 		Currency     string
 	}
 	AmountModel struct {
-		Amount   *uint64 `json:"amount,omitempty"`
+		Amount   *string `json:"amount,omitempty"`
 		Currency string  `json:"currency,omitempty"`
 	}
 	CreateWalletModel struct {
-		ID *uuid.UUID `json:"id,omitempty"`
-
-		Balance       map[WalletCurrency]*uint64 `json:"balance,omitempty"`
-		LockedBalance map[WalletCurrency]*uint64 `json:"lockedBalance,omitempty"`
+		ID            *uuid.UUID                 `json:"id,omitempty"`
+		ExternalID    string                     `json:"externalID,omitempty"`
+		Balance       map[WalletCurrency]*string `json:"balance,omitempty"`
+		LockedBalance map[WalletCurrency]*string `json:"lockedBalance,omitempty"`
 
 		CreatedAt time.Time  `json:"createdAt,omitempty"`
 		UpdatedAt *time.Time `json:"updatedAt,omitempty"`
@@ -60,11 +66,15 @@ func (p *Handler) Transfer(c *gin.Context) error {
 	var t TransferModel
 	err := c.BindJSON(&t)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "au")
 		return err
 	}
 
-	return p.d.WalletManager().Transfer(c, t.FromWalletID, t.ToWalletID, big.NewInt(0).SetUint64(*t.Amount), WalletCurrency(t.Currency))
+	amount, ok := new(big.Int).SetString(*t.Amount, 10)
+	if !ok {
+		return ErrBadRequest.WithDescription("Cannot cast amount string to big.Int")
+	}
+
+	return p.d.WalletManager().Transfer(c, t.FromWalletID, t.ToWalletID, amount, WalletCurrency(t.Currency))
 }
 
 // GetWallet godoc
@@ -74,21 +84,49 @@ func (p *Handler) Transfer(c *gin.Context) error {
 // @Accept       		json
 // @Produce      		json
 // @Param        		id  			path		string				true	"Wallet id"
-// @Success      		200 			{object}   	WalletUint64				"wallet"
+// @Success      		200 			{object}   	WalletResponse				"wallet"
 // @Failure      		400
 // @Router       		/v1/open/wallet/{id} [get]
 func (p *Handler) WalletByID(c *gin.Context) error {
 	id := c.Param("id")
 	if id == "" {
-		c.JSON(http.StatusBadRequest, "au")
-		return errors.New("au")
+		c.JSON(http.StatusBadRequest, errors.New("WalletNotFound"))
+		return errors.New("WalletNotFound")
 	}
 	w, err := p.d.WalletManager().WalletByID(c, uuid.FromStringOrNil(id))
 	if err != nil {
 		return err
 	}
 
-	c.JSON(http.StatusOK, w.ToWalletUint64())
+	c.JSON(http.StatusOK, w.ToWalletResponse())
+	return nil
+}
+
+// GetWalletByExternalID godoc
+// @Summary      		Get Wallet by externalID
+// @Description  		Get wallet infos by ExternalID
+// @Tags         		wallet
+// @Accept       		json
+// @Produce      		json
+// @Param        		id  			path		string				true	"External id"
+// @Success      		200 			{object}   	WalletResponse				"wallet"
+// @Failure      		400
+// @Router       		/v1/open/wallet/external/{id} [get]
+func (p *Handler) WalletByExternalID(c *gin.Context) error {
+	id := c.Param("id")
+	if id == "" {
+		return ErrWalletNotFound
+	}
+	w, err := p.d.WalletManager().WalletByExternalID(c, id)
+	if err != nil {
+		return err
+	}
+
+	if w == nil {
+		return ErrWalletNotFound
+	}
+
+	c.JSON(http.StatusOK, w.ToWalletResponse())
 	return nil
 }
 
@@ -105,8 +143,8 @@ func (p *Handler) WalletByID(c *gin.Context) error {
 func (p *Handler) WalletRecords(c *gin.Context) error {
 	id := c.Param("id")
 	if id == "" {
-		c.JSON(http.StatusBadRequest, "au")
-		return errors.New("au")
+		c.JSON(http.StatusBadRequest, ErrBadRequest)
+		return ErrBadRequest
 	}
 	w, err := p.d.WalletManager().WalletRecordsByID(c, uuid.FromStringOrNil(id))
 	if err != nil {
@@ -132,16 +170,22 @@ func (p *Handler) Burn(c *gin.Context) error {
 	var b AmountModel
 	err := c.BindJSON(&b)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "au")
+		c.JSON(http.StatusBadRequest, ErrBadRequest)
 		return err
 	}
 
 	wID := c.Param("id")
 	if wID == "" {
-		c.JSON(http.StatusBadRequest, "au")
-		return errors.New("au")
+		c.JSON(http.StatusBadRequest, ErrBadRequest)
+		return ErrBadRequest
 	}
-	return p.d.WalletManager().Burn(c, uuid.FromStringOrNil(wID), big.NewInt(0).SetUint64(*b.Amount), WalletCurrency(b.Currency))
+
+	amount, ok := new(big.Int).SetString(*b.Amount, 10)
+	if !ok {
+		return ErrBadRequest.WithDescription("Cannot cast amount string to big.Int")
+	}
+
+	return p.d.WalletManager().Burn(c, uuid.FromStringOrNil(wID), amount, WalletCurrency(b.Currency))
 }
 
 // Mint godoc
@@ -159,17 +203,22 @@ func (p *Handler) Mint(c *gin.Context) error {
 	var m AmountModel
 	err := c.BindJSON(&m)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "au")
+		c.JSON(http.StatusBadRequest, ErrBadRequest)
 		return err
 	}
 
 	wID := c.Param("id")
 	if wID == "" {
-		c.JSON(http.StatusBadRequest, "au")
-		return errors.New("au")
+		c.JSON(http.StatusBadRequest, ErrBadRequest)
+		return ErrBadRequest
 	}
 
-	return p.d.WalletManager().Mint(c, uuid.FromStringOrNil(wID), big.NewInt(0).SetUint64(*m.Amount), WalletCurrency(m.Currency))
+	amount, ok := new(big.Int).SetString(*m.Amount, 10)
+	if !ok {
+		return ErrBadRequest.WithDescription("Cannot cast amount string to big.Int")
+	}
+
+	return p.d.WalletManager().Mint(c, uuid.FromStringOrNil(wID), amount, WalletCurrency(m.Currency))
 }
 
 // Lock godoc
@@ -187,17 +236,22 @@ func (p *Handler) Lock(c *gin.Context) error {
 	var m AmountModel
 	err := c.BindJSON(&m)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "au")
+		c.JSON(http.StatusBadRequest, ErrBadRequest)
 		return err
 	}
 
 	wID := c.Param("id")
 	if wID == "" {
-		c.JSON(http.StatusBadRequest, "au")
-		return errors.New("au")
+		c.JSON(http.StatusBadRequest, ErrBadRequest)
+		return ErrBadRequest
 	}
 
-	return p.d.WalletManager().Lock(c, uuid.FromStringOrNil(wID), big.NewInt(0).SetUint64(*m.Amount), WalletCurrency(m.Currency))
+	amount, ok := new(big.Int).SetString(*m.Amount, 10)
+	if !ok {
+		return ErrBadRequest.WithDescription("Cannot cast amount string to big.Int")
+	}
+
+	return p.d.WalletManager().Lock(c, uuid.FromStringOrNil(wID), amount, WalletCurrency(m.Currency))
 }
 
 // Unlock godoc
@@ -215,17 +269,22 @@ func (p *Handler) Unlock(c *gin.Context) error {
 	var m AmountModel
 	err := c.BindJSON(&m)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "au")
+		c.JSON(http.StatusBadRequest, ErrBadRequest)
 		return err
 	}
 
 	wID := c.Param("id")
 	if wID == "" {
-		c.JSON(http.StatusBadRequest, "au")
-		return errors.New("au")
+		c.JSON(http.StatusBadRequest, ErrBadRequest)
+		return ErrBadRequest
 	}
 
-	return p.d.WalletManager().Unlock(c, uuid.FromStringOrNil(wID), big.NewInt(0).SetUint64(*m.Amount), WalletCurrency(m.Currency))
+	amount, ok := new(big.Int).SetString(*m.Amount, 10)
+	if !ok {
+		return ErrBadRequest.WithDescription("Cannot cast amount string to big.Int")
+	}
+
+	return p.d.WalletManager().Unlock(c, uuid.FromStringOrNil(wID), amount, WalletCurrency(m.Currency))
 }
 
 // MintAndLock godoc
@@ -243,16 +302,22 @@ func (p *Handler) MintAndLock(c *gin.Context) error {
 	var m AmountModel
 	err := c.BindJSON(&m)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "au")
+		c.JSON(http.StatusBadRequest, ErrBadRequest)
 		return err
 	}
 
 	wID := c.Param("id")
 	if wID == "" {
-		c.JSON(http.StatusBadRequest, "au")
-		return errors.New("au")
+		c.JSON(http.StatusBadRequest, ErrBadRequest)
+		return ErrBadRequest
 	}
-	return p.d.WalletManager().MintAndLock(c, uuid.FromStringOrNil(wID), big.NewInt(0).SetUint64(*m.Amount), WalletCurrency(m.Currency))
+
+	amount, ok := new(big.Int).SetString(*m.Amount, 10)
+	if !ok {
+		return ErrBadRequest.WithDescription("Cannot cast amount string to big.Int")
+	}
+
+	return p.d.WalletManager().MintAndLock(c, uuid.FromStringOrNil(wID), amount, WalletCurrency(m.Currency))
 }
 
 // UnlockAndBurn godoc
@@ -270,16 +335,22 @@ func (p *Handler) UnlockAndBurn(c *gin.Context) error {
 	var m AmountModel
 	err := c.BindJSON(&m)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "au")
+		c.JSON(http.StatusBadRequest, ErrBadRequest)
 		return err
 	}
 
 	wID := c.Param("id")
 	if wID == "" {
-		c.JSON(http.StatusBadRequest, "au")
-		return errors.New("au")
+		c.JSON(http.StatusBadRequest, ErrBadRequest)
+		return ErrBadRequest
 	}
-	return p.d.WalletManager().UnlockAndBurn(c, uuid.FromStringOrNil(wID), big.NewInt(0).SetUint64(*m.Amount), WalletCurrency(m.Currency))
+
+	amount, ok := new(big.Int).SetString(*m.Amount, 10)
+	if !ok {
+		return ErrBadRequest.WithDescription("Cannot cast amount string to big.Int")
+	}
+
+	return p.d.WalletManager().UnlockAndBurn(c, uuid.FromStringOrNil(wID), amount, WalletCurrency(m.Currency))
 }
 
 // CreateWallet godoc
@@ -289,14 +360,14 @@ func (p *Handler) UnlockAndBurn(c *gin.Context) error {
 // @Accept       		json
 // @Produce      		json
 // @Param      			model     		body   		CreateWalletModel 		true	"Create wallet model"
-// @Success      		200 			{object}   	WalletUint64					"wallet"
+// @Success      		200 			{object}   	WalletResponse					"wallet"
 // @Failure      		400
 // @Router       		/v1/admin/wallet [post]
 func (p *Handler) CreateWallet(c *gin.Context) error {
 	var w CreateWalletModel
 	err := c.BindJSON(&w)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "au")
+		c.JSON(http.StatusBadRequest, ErrBadRequest)
 		return err
 	}
 
@@ -310,13 +381,23 @@ func (p *Handler) CreateWallet(c *gin.Context) error {
 
 	if w.Balance != nil {
 		for k, v := range w.Balance {
-			balance[k] = big.NewInt(0).SetUint64(*v)
+			amount, ok := new(big.Int).SetString(*v, 10)
+			if !ok {
+				balance[k] = big.NewInt(0)
+			} else {
+				balance[k] = amount
+			}
 		}
 	}
 
 	if w.LockedBalance != nil {
 		for k, v := range w.LockedBalance {
-			lockedBalance[k] = big.NewInt(0).SetUint64(*v)
+			amount, ok := new(big.Int).SetString(*v, 10)
+			if !ok {
+				lockedBalance[k] = big.NewInt(0)
+			} else {
+				lockedBalance[k] = amount
+			}
 		}
 	}
 
@@ -325,21 +406,23 @@ func (p *Handler) CreateWallet(c *gin.Context) error {
 		Balance:       balance,
 		LockedBalance: lockedBalance,
 		Version:       w.Version,
+		ExternalID:    w.ExternalID,
 	}
 
 	err = p.d.WalletManager().d.WalletPersister().SaveWallet(c, []*Wallet{wallet}, make([]*WalletRecord, 0), make([]*WalletTransaction, 0))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "au")
+		c.JSON(http.StatusBadRequest, ErrBadRequest)
 		return err
 	}
 
-	c.JSON(http.StatusOK, wallet)
+	c.JSON(http.StatusOK, wallet.ToWalletResponse())
 	return nil
 }
 
 func (p *Handler) RegisterOpenRoutes(r *gin.RouterGroup) {
 	r.POST("/wallet/transfer", xerrors.HandleWithError(p.Transfer))
 	r.GET("/wallet/:id", xerrors.HandleWithError(p.WalletByID))
+	r.GET("/wallet/external/:id", xerrors.HandleWithError(p.WalletByExternalID))
 	r.GET("/wallet/:id/records", xerrors.HandleWithError(p.WalletRecords))
 }
 

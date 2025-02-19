@@ -26,33 +26,6 @@ func NewPersister(d persisterDependencies) (*Persister, error) {
 		return nil, err
 	}
 
-	// tx, err := db.Begin(true)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// defer tx.Rollback()
-
-	// Use the transaction...
-	// _, err = tx.CreateBucket([]byte("Wallets"))
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// _, err = tx.CreateBucket([]byte("WalletRecords"))
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// _, err = tx.CreateBucket([]byte("WalletTransactions"))
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// // Commit the transaction and check for error.
-	// if err := tx.Commit(); err != nil {
-	// 	return nil, err
-	// }
-
 	return &Persister{
 		db: db,
 	}, nil
@@ -113,6 +86,30 @@ func (p *Persister) FindWalletByID(ctx context.Context, id uuid.UUID) (*wallet.W
 		}
 
 		return nil
+	})
+
+	return res, err
+}
+
+func (p *Persister) FindWalletByExternalID(ctx context.Context, id string) (*wallet.Wallet, error) {
+	var res *wallet.Wallet
+	err := p.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("Wallets"))
+		err := b.ForEach(func(k, v []byte) error {
+			var wa *wallet.Wallet
+			err := json.Unmarshal(v, &wa)
+			if err != nil {
+				return err
+			}
+
+			if wa.ExternalID == id {
+				res = wa
+			}
+
+			return nil
+		})
+
+		return err
 	})
 
 	return res, err

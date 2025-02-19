@@ -20,7 +20,7 @@ var _ MappedNullable = &WalletTransferModel{}
 
 // WalletTransferModel struct for WalletTransferModel
 type WalletTransferModel struct {
-	Amount *int32 `json:"amount,omitempty"`
+	Amount *string `json:"amount,omitempty"`
 	Currency *string `json:"currency,omitempty"`
 	FromWalletID *string `json:"fromWalletID,omitempty"`
 	ToWalletID *string `json:"toWalletID,omitempty"`
@@ -44,9 +44,9 @@ func NewWalletTransferModelWithDefaults() *WalletTransferModel {
 }
 
 // GetAmount returns the Amount field value if set, zero value otherwise.
-func (o *WalletTransferModel) GetAmount() int32 {
+func (o *WalletTransferModel) GetAmount() string {
 	if o == nil || IsNil(o.Amount) {
-		var ret int32
+		var ret string
 		return ret
 	}
 	return *o.Amount
@@ -54,7 +54,7 @@ func (o *WalletTransferModel) GetAmount() int32 {
 
 // GetAmountOk returns a tuple with the Amount field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WalletTransferModel) GetAmountOk() (*int32, bool) {
+func (o *WalletTransferModel) GetAmountOk() (*string, bool) {
 	if o == nil || IsNil(o.Amount) {
 		return nil, false
 	}
@@ -70,8 +70,8 @@ func (o *WalletTransferModel) HasAmount() bool {
 	return false
 }
 
-// SetAmount gets a reference to the given int32 and assigns it to the Amount field.
-func (o *WalletTransferModel) SetAmount(v int32) {
+// SetAmount gets a reference to the given string and assigns it to the Amount field.
+func (o *WalletTransferModel) SetAmount(v string) {
 	o.Amount = &v
 }
 

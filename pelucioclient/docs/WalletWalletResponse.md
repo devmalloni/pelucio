@@ -1,4 +1,4 @@
-# WalletCreateWalletModel
+# WalletWalletResponse
 
 ## Properties
 
@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Balance** | Pointer to **map[string]string** |  | [optional] 
 **CreatedAt** | Pointer to **string** |  | [optional] 
-**ExternalID** | Pointer to **string** |  | [optional] 
+**ExternalId** | Pointer to **string** |  | [optional] 
 **Id** | Pointer to **string** |  | [optional] 
 **LockedBalance** | Pointer to **map[string]string** |  | [optional] 
 **UpdatedAt** | Pointer to **string** |  | [optional] 
@@ -14,195 +14,195 @@ Name | Type | Description | Notes
 
 ## Methods
 
-### NewWalletCreateWalletModel
+### NewWalletWalletResponse
 
-`func NewWalletCreateWalletModel() *WalletCreateWalletModel`
+`func NewWalletWalletResponse() *WalletWalletResponse`
 
-NewWalletCreateWalletModel instantiates a new WalletCreateWalletModel object
+NewWalletWalletResponse instantiates a new WalletWalletResponse object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewWalletCreateWalletModelWithDefaults
+### NewWalletWalletResponseWithDefaults
 
-`func NewWalletCreateWalletModelWithDefaults() *WalletCreateWalletModel`
+`func NewWalletWalletResponseWithDefaults() *WalletWalletResponse`
 
-NewWalletCreateWalletModelWithDefaults instantiates a new WalletCreateWalletModel object
+NewWalletWalletResponseWithDefaults instantiates a new WalletWalletResponse object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetBalance
 
-`func (o *WalletCreateWalletModel) GetBalance() map[string]string`
+`func (o *WalletWalletResponse) GetBalance() map[string]string`
 
 GetBalance returns the Balance field if non-nil, zero value otherwise.
 
 ### GetBalanceOk
 
-`func (o *WalletCreateWalletModel) GetBalanceOk() (*map[string]string, bool)`
+`func (o *WalletWalletResponse) GetBalanceOk() (*map[string]string, bool)`
 
 GetBalanceOk returns a tuple with the Balance field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetBalance
 
-`func (o *WalletCreateWalletModel) SetBalance(v map[string]string)`
+`func (o *WalletWalletResponse) SetBalance(v map[string]string)`
 
 SetBalance sets Balance field to given value.
 
 ### HasBalance
 
-`func (o *WalletCreateWalletModel) HasBalance() bool`
+`func (o *WalletWalletResponse) HasBalance() bool`
 
 HasBalance returns a boolean if a field has been set.
 
 ### GetCreatedAt
 
-`func (o *WalletCreateWalletModel) GetCreatedAt() string`
+`func (o *WalletWalletResponse) GetCreatedAt() string`
 
 GetCreatedAt returns the CreatedAt field if non-nil, zero value otherwise.
 
 ### GetCreatedAtOk
 
-`func (o *WalletCreateWalletModel) GetCreatedAtOk() (*string, bool)`
+`func (o *WalletWalletResponse) GetCreatedAtOk() (*string, bool)`
 
 GetCreatedAtOk returns a tuple with the CreatedAt field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetCreatedAt
 
-`func (o *WalletCreateWalletModel) SetCreatedAt(v string)`
+`func (o *WalletWalletResponse) SetCreatedAt(v string)`
 
 SetCreatedAt sets CreatedAt field to given value.
 
 ### HasCreatedAt
 
-`func (o *WalletCreateWalletModel) HasCreatedAt() bool`
+`func (o *WalletWalletResponse) HasCreatedAt() bool`
 
 HasCreatedAt returns a boolean if a field has been set.
 
-### GetExternalID
+### GetExternalId
 
-`func (o *WalletCreateWalletModel) GetExternalID() string`
+`func (o *WalletWalletResponse) GetExternalId() string`
 
-GetExternalID returns the ExternalID field if non-nil, zero value otherwise.
+GetExternalId returns the ExternalId field if non-nil, zero value otherwise.
 
-### GetExternalIDOk
+### GetExternalIdOk
 
-`func (o *WalletCreateWalletModel) GetExternalIDOk() (*string, bool)`
+`func (o *WalletWalletResponse) GetExternalIdOk() (*string, bool)`
 
-GetExternalIDOk returns a tuple with the ExternalID field if it's non-nil, zero value otherwise
+GetExternalIdOk returns a tuple with the ExternalId field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetExternalID
+### SetExternalId
 
-`func (o *WalletCreateWalletModel) SetExternalID(v string)`
+`func (o *WalletWalletResponse) SetExternalId(v string)`
 
-SetExternalID sets ExternalID field to given value.
+SetExternalId sets ExternalId field to given value.
 
-### HasExternalID
+### HasExternalId
 
-`func (o *WalletCreateWalletModel) HasExternalID() bool`
+`func (o *WalletWalletResponse) HasExternalId() bool`
 
-HasExternalID returns a boolean if a field has been set.
+HasExternalId returns a boolean if a field has been set.
 
 ### GetId
 
-`func (o *WalletCreateWalletModel) GetId() string`
+`func (o *WalletWalletResponse) GetId() string`
 
 GetId returns the Id field if non-nil, zero value otherwise.
 
 ### GetIdOk
 
-`func (o *WalletCreateWalletModel) GetIdOk() (*string, bool)`
+`func (o *WalletWalletResponse) GetIdOk() (*string, bool)`
 
 GetIdOk returns a tuple with the Id field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetId
 
-`func (o *WalletCreateWalletModel) SetId(v string)`
+`func (o *WalletWalletResponse) SetId(v string)`
 
 SetId sets Id field to given value.
 
 ### HasId
 
-`func (o *WalletCreateWalletModel) HasId() bool`
+`func (o *WalletWalletResponse) HasId() bool`
 
 HasId returns a boolean if a field has been set.
 
 ### GetLockedBalance
 
-`func (o *WalletCreateWalletModel) GetLockedBalance() map[string]string`
+`func (o *WalletWalletResponse) GetLockedBalance() map[string]string`
 
 GetLockedBalance returns the LockedBalance field if non-nil, zero value otherwise.
 
 ### GetLockedBalanceOk
 
-`func (o *WalletCreateWalletModel) GetLockedBalanceOk() (*map[string]string, bool)`
+`func (o *WalletWalletResponse) GetLockedBalanceOk() (*map[string]string, bool)`
 
 GetLockedBalanceOk returns a tuple with the LockedBalance field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetLockedBalance
 
-`func (o *WalletCreateWalletModel) SetLockedBalance(v map[string]string)`
+`func (o *WalletWalletResponse) SetLockedBalance(v map[string]string)`
 
 SetLockedBalance sets LockedBalance field to given value.
 
 ### HasLockedBalance
 
-`func (o *WalletCreateWalletModel) HasLockedBalance() bool`
+`func (o *WalletWalletResponse) HasLockedBalance() bool`
 
 HasLockedBalance returns a boolean if a field has been set.
 
 ### GetUpdatedAt
 
-`func (o *WalletCreateWalletModel) GetUpdatedAt() string`
+`func (o *WalletWalletResponse) GetUpdatedAt() string`
 
 GetUpdatedAt returns the UpdatedAt field if non-nil, zero value otherwise.
 
 ### GetUpdatedAtOk
 
-`func (o *WalletCreateWalletModel) GetUpdatedAtOk() (*string, bool)`
+`func (o *WalletWalletResponse) GetUpdatedAtOk() (*string, bool)`
 
 GetUpdatedAtOk returns a tuple with the UpdatedAt field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetUpdatedAt
 
-`func (o *WalletCreateWalletModel) SetUpdatedAt(v string)`
+`func (o *WalletWalletResponse) SetUpdatedAt(v string)`
 
 SetUpdatedAt sets UpdatedAt field to given value.
 
 ### HasUpdatedAt
 
-`func (o *WalletCreateWalletModel) HasUpdatedAt() bool`
+`func (o *WalletWalletResponse) HasUpdatedAt() bool`
 
 HasUpdatedAt returns a boolean if a field has been set.
 
 ### GetVersion
 
-`func (o *WalletCreateWalletModel) GetVersion() string`
+`func (o *WalletWalletResponse) GetVersion() string`
 
 GetVersion returns the Version field if non-nil, zero value otherwise.
 
 ### GetVersionOk
 
-`func (o *WalletCreateWalletModel) GetVersionOk() (*string, bool)`
+`func (o *WalletWalletResponse) GetVersionOk() (*string, bool)`
 
 GetVersionOk returns a tuple with the Version field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetVersion
 
-`func (o *WalletCreateWalletModel) SetVersion(v string)`
+`func (o *WalletWalletResponse) SetVersion(v string)`
 
 SetVersion sets Version field to given value.
 
 ### HasVersion
 
-`func (o *WalletCreateWalletModel) HasVersion() bool`
+`func (o *WalletWalletResponse) HasVersion() bool`
 
 HasVersion returns a boolean if a field has been set.
 

@@ -26,7 +26,8 @@ type (
 	WalletTransactionStatus uint8
 
 	Wallet struct {
-		ID uuid.UUID `json:"id,omitempty"`
+		ID         uuid.UUID `json:"id,omitempty"`
+		ExternalID string    `json:"external_id,omitempty"`
 
 		Balance       map[WalletCurrency]*big.Int `json:"balance,omitempty"`
 		LockedBalance map[WalletCurrency]*big.Int `json:"lockedBalance,omitempty"`
@@ -54,11 +55,12 @@ type (
 		CreatedAt     time.Time
 	}
 
-	WalletUint64 struct {
-		ID uuid.UUID `json:"id,omitempty"`
+	WalletResponse struct {
+		ID         uuid.UUID `json:"id,omitempty"`
+		ExternalID string    `json:"external_id,omitempty"`
 
-		Balance       map[WalletCurrency]*uint64 `json:"balance,omitempty"`
-		LockedBalance map[WalletCurrency]*uint64 `json:"lockedBalance,omitempty"`
+		Balance       map[WalletCurrency]*string `json:"balance,omitempty"`
+		LockedBalance map[WalletCurrency]*string `json:"lockedBalance,omitempty"`
 
 		CreatedAt time.Time  `json:"createdAt,omitempty"`
 		UpdatedAt *time.Time `json:"updatedAt,omitempty"`
@@ -115,8 +117,8 @@ func (p *Wallet) Unlock(amount *big.Int, currency WalletCurrency) *WalletRecord 
 }
 
 func (p *Wallet) Apply(records ...*WalletRecord) error {
-	balances := make(map[WalletCurrency]*big.Int)
-	lockedBalances := make(map[WalletCurrency]*big.Int)
+	balances := p.Balance
+	lockedBalances := p.LockedBalance
 
 	for i := range records {
 		currency := records[i].Currency
@@ -173,27 +175,28 @@ func (p *Wallet) balanceOf(currencyMap map[WalletCurrency]*big.Int, currency Wal
 	return new(big.Int).Set(c)
 }
 
-func (p *Wallet) ToWalletUint64() *WalletUint64 {
-	balance := make(map[WalletCurrency]*uint64)
-	lockedBalance := make(map[WalletCurrency]*uint64)
+func (p *Wallet) ToWalletResponse() *WalletResponse {
+	balance := make(map[WalletCurrency]*string)
+	lockedBalance := make(map[WalletCurrency]*string)
 
 	for k, v := range p.Balance {
-		u := v.Uint64()
-		balance[k] = &u
+		vv := v.String()
+		balance[k] = &vv
 	}
 
 	for k, v := range p.LockedBalance {
-		u := v.Uint64()
-		lockedBalance[k] = &u
+		vv := v.String()
+		lockedBalance[k] = &vv
 	}
 
-	return &WalletUint64{
+	return &WalletResponse{
 		ID:            p.ID,
 		Version:       p.Version,
 		CreatedAt:     p.CreatedAt,
 		UpdatedAt:     p.UpdatedAt,
 		Balance:       balance,
 		LockedBalance: lockedBalance,
+		ExternalID:    p.ExternalID,
 	}
 }
 
