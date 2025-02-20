@@ -12,9 +12,10 @@ import (
 )
 
 var (
-	ErrNotFound       = xerrors.New("ErrNotFound")
-	ErrWalletNotFound = xerrors.New("ErrWalletNotFound")
-	ErrBadRequest     = xerrors.New("ErrBadRequest")
+	ErrNotFound            = xerrors.New("ErrNotFound")
+	ErrWalletNotFound      = xerrors.New("ErrWalletNotFound")
+	ErrBadRequest          = xerrors.New("ErrBadRequest")
+	ErrExternalIDHasExists = xerrors.New("ErrExternalIDHasExists")
 )
 
 type (
@@ -367,8 +368,16 @@ func (p *Handler) CreateWallet(c *gin.Context) error {
 	var w CreateWalletModel
 	err := c.BindJSON(&w)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, ErrBadRequest)
 		return err
+	}
+
+	ww, err := p.d.WalletManager().d.WalletPersister().FindWalletByExternalID(c, w.ExternalID)
+	if err != nil {
+		return err
+	}
+
+	if ww != nil && ww.ID.String() != "" {
+		return ErrExternalIDHasExists
 	}
 
 	if w.ID == nil {
