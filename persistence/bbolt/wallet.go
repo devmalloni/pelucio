@@ -149,3 +149,24 @@ func (p *Persister) FindWalletTransactions(ctx context.Context, walletID uuid.UU
 
 	return res, err
 }
+
+func (p *Persister) FindWallets(ctx context.Context) ([]*wallet.Wallet, error) {
+	var res []*wallet.Wallet
+	err := p.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("Wallets"))
+		err := b.ForEach(func(k, v []byte) error {
+			var wa *wallet.Wallet
+			err := json.Unmarshal(v, &wa)
+			if err != nil {
+				return err
+			}
+
+			res = append(res, wa)
+			return nil
+		})
+
+		return err
+	})
+
+	return res, err
+}

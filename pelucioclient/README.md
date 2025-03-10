@@ -85,6 +85,7 @@ Class | Method | HTTP request | Description
 *WalletAPI* | [**V1AdminWalletIdMintandlockPost**](docs/WalletAPI.md#v1adminwalletidmintandlockpost) | **Post** /v1/admin/wallet/{id}/mintandlock | Unlock and burn Transaction
 *WalletAPI* | [**V1AdminWalletIdUnlockPost**](docs/WalletAPI.md#v1adminwalletidunlockpost) | **Post** /v1/admin/wallet/{id}/unlock | Unlock Transaction
 *WalletAPI* | [**V1AdminWalletPost**](docs/WalletAPI.md#v1adminwalletpost) | **Post** /v1/admin/wallet | Create a wallet
+*WalletAPI* | [**V1AdminWalletsGet**](docs/WalletAPI.md#v1adminwalletsget) | **Get** /v1/admin/wallets | Get Wallets
 *WalletAPI* | [**V1OpenWalletExternalIdGet**](docs/WalletAPI.md#v1openwalletexternalidget) | **Get** /v1/open/wallet/external/{id} | Get Wallet by externalID
 *WalletAPI* | [**V1OpenWalletIdGet**](docs/WalletAPI.md#v1openwalletidget) | **Get** /v1/open/wallet/{id} | Get Wallet
 *WalletAPI* | [**V1OpenWalletIdRecordsGet**](docs/WalletAPI.md#v1openwalletidrecordsget) | **Get** /v1/open/wallet/{id}/records | Get Wallet records

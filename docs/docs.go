@@ -261,6 +261,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/admin/wallets": {
+            "get": {
+                "description": "Get wallets",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wallet"
+                ],
+                "summary": "Get Wallets",
+                "responses": {
+                    "200": {
+                        "description": "wallet",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/wallet.WalletResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
         "/v1/open/wallet/external/{id}": {
             "get": {
                 "description": "Get wallet infos by ExternalID",

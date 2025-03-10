@@ -103,6 +103,31 @@ func (p *Handler) WalletByID(c *gin.Context) error {
 	return nil
 }
 
+// GetWallets godoc
+// @Summary      		Get Wallets
+// @Description  		Get wallets
+// @Tags         		wallet
+// @Accept       		json
+// @Produce      		json
+// @Success      		200 			{array}   	WalletResponse				"wallet"
+// @Failure      		400
+// @Router       		/v1/admin/wallets [get]
+func (p *Handler) GetWallets(c *gin.Context) error {
+	w, err := p.d.WalletManager().GetWallets(c)
+	if err != nil {
+		return err
+	}
+
+	wr := []*WalletResponse{}
+
+	for _, ww := range w {
+		wr = append(wr, ww.ToWalletResponse())
+	}
+
+	c.JSON(http.StatusOK, wr)
+	return nil
+}
+
 // GetWalletByExternalID godoc
 // @Summary      		Get Wallet by externalID
 // @Description  		Get wallet infos by ExternalID
@@ -443,4 +468,5 @@ func (p *Handler) RegisterAdminRoutes(r *gin.RouterGroup) {
 	r.POST("/wallet/:id/mintandlock", xerrors.HandleWithError(p.MintAndLock))
 	r.POST("/wallet/:id/unlockandburn", xerrors.HandleWithError(p.UnlockAndBurn))
 	r.POST("/wallet", xerrors.HandleWithError(p.CreateWallet))
+	r.GET("/wallets", xerrors.HandleWithError(p.GetWallets))
 }

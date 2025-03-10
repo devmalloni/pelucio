@@ -281,6 +281,25 @@ paths:
       summary: Unlock Transaction
       tags:
       - wallet
+  /v1/admin/wallets:
+    get:
+      consumes:
+      - application/json
+      description: Get wallets
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: wallet
+          schema:
+            items:
+              $ref: '#/definitions/wallet.WalletResponse'
+            type: array
+        "400":
+          description: Bad Request
+      summary: Get Wallets
+      tags:
+      - wallet
   /v1/open/wallet/{id}:
     get:
       consumes:

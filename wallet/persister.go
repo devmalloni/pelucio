@@ -13,6 +13,7 @@ type (
 		FindWalletByExternalID(ctx context.Context, id string) (*Wallet, error)
 		FindWalletRecords(ctx context.Context, walletID uuid.UUID) ([]*WalletRecord, error)
 		FindWalletTransactions(ctx context.Context, walletID uuid.UUID) ([]*WalletTransaction, error)
+		FindWallets(ctx context.Context) ([]*Wallet, error)
 	}
 
 	PersisterProvider interface {

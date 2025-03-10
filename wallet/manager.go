@@ -405,3 +405,7 @@ func (p *Manager) CreateWallet(ctx context.Context, id *uuid.UUID) (*Wallet, err
 
 	return wallet, err
 }
+
+func (p *Manager) GetWallets(ctx context.Context) ([]*Wallet, error) {
+	return p.d.WalletPersister().FindWallets(ctx)
+}

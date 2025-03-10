@@ -10,6 +10,7 @@ Method | HTTP request | Description
 [**V1AdminWalletIdMintandlockPost**](WalletAPI.md#V1AdminWalletIdMintandlockPost) | **Post** /v1/admin/wallet/{id}/mintandlock | Unlock and burn Transaction
 [**V1AdminWalletIdUnlockPost**](WalletAPI.md#V1AdminWalletIdUnlockPost) | **Post** /v1/admin/wallet/{id}/unlock | Unlock Transaction
 [**V1AdminWalletPost**](WalletAPI.md#V1AdminWalletPost) | **Post** /v1/admin/wallet | Create a wallet
+[**V1AdminWalletsGet**](WalletAPI.md#V1AdminWalletsGet) | **Get** /v1/admin/wallets | Get Wallets
 [**V1OpenWalletExternalIdGet**](WalletAPI.md#V1OpenWalletExternalIdGet) | **Get** /v1/open/wallet/external/{id} | Get Wallet by externalID
 [**V1OpenWalletIdGet**](WalletAPI.md#V1OpenWalletIdGet) | **Get** /v1/open/wallet/{id} | Get Wallet
 [**V1OpenWalletIdRecordsGet**](WalletAPI.md#V1OpenWalletIdRecordsGet) | **Get** /v1/open/wallet/{id}/records | Get Wallet records
@@ -426,6 +427,67 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## V1AdminWalletsGet
+
+> []WalletWalletResponse V1AdminWalletsGet(ctx).Execute()
+
+Get Wallets
+
+
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.WalletAPI.V1AdminWalletsGet(context.Background()).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `WalletAPI.V1AdminWalletsGet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `V1AdminWalletsGet`: []WalletWalletResponse
+	fmt.Fprintf(os.Stdout, "Response from `WalletAPI.V1AdminWalletsGet`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+This endpoint does not need any parameter.
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiV1AdminWalletsGetRequest struct via the builder pattern
+
+
+### Return type
+
+[**[]WalletWalletResponse**](WalletWalletResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)

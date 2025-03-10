@@ -174,6 +174,24 @@ paths:
       tags:
       - wallet
       x-codegen-request-body-name: model
+  /v1/admin/wallets:
+    get:
+      description: Get wallets
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/wallet.WalletResponse'
+                type: array
+          description: wallet
+        "400":
+          content: {}
+          description: Bad Request
+      summary: Get Wallets
+      tags:
+      - wallet
   /v1/open/wallet/{id}:
     get:
       description: Get wallet infos by ID
