@@ -36,10 +36,9 @@ type (
 		Currency string  `json:"currency,omitempty"`
 	}
 	CreateWalletModel struct {
-		ID            *uuid.UUID                 `json:"id,omitempty"`
-		ExternalID    string                     `json:"externalID,omitempty"`
-		Balance       map[WalletCurrency]*string `json:"balance,omitempty"`
-		LockedBalance map[WalletCurrency]*string `json:"lockedBalance,omitempty"`
+		ID         *uuid.UUID `json:"id,omitempty"`
+		ExternalID string     `json:"externalID,omitempty"`
+		Balances   *[]string  `json:"balances,omitempty"`
 
 		CreatedAt time.Time  `json:"createdAt,omitempty"`
 		UpdatedAt *time.Time `json:"updatedAt,omitempty"`
@@ -413,25 +412,15 @@ func (p *Handler) CreateWallet(c *gin.Context) error {
 	balance := make(map[WalletCurrency]*big.Int)
 	lockedBalance := make(map[WalletCurrency]*big.Int)
 
-	if w.Balance != nil {
-		for k, v := range w.Balance {
-			amount, ok := new(big.Int).SetString(*v, 10)
-			if !ok {
-				balance[k] = big.NewInt(0)
-			} else {
-				balance[k] = amount
-			}
+	if w.Balances != nil {
+		for _, v := range *w.Balances {
+			balance[WalletCurrency(v)] = big.NewInt(0)
 		}
 	}
 
-	if w.LockedBalance != nil {
-		for k, v := range w.LockedBalance {
-			amount, ok := new(big.Int).SetString(*v, 10)
-			if !ok {
-				lockedBalance[k] = big.NewInt(0)
-			} else {
-				lockedBalance[k] = amount
-			}
+	if w.Balances != nil {
+		for _, v := range *w.Balances {
+			lockedBalance[WalletCurrency(v)] = big.NewInt(0)
 		}
 	}
 
@@ -441,6 +430,7 @@ func (p *Handler) CreateWallet(c *gin.Context) error {
 		LockedBalance: lockedBalance,
 		Version:       w.Version,
 		ExternalID:    w.ExternalID,
+		CreatedAt:     time.Now(),
 	}
 
 	err = p.d.WalletManager().d.WalletPersister().SaveWallet(c, []*Wallet{wallet}, make([]*WalletRecord, 0), make([]*WalletTransaction, 0))

@@ -20,11 +20,10 @@ var _ MappedNullable = &WalletCreateWalletModel{}
 
 // WalletCreateWalletModel struct for WalletCreateWalletModel
 type WalletCreateWalletModel struct {
-	Balance *map[string]string `json:"balance,omitempty"`
+	Balances []string `json:"balances,omitempty"`
 	CreatedAt *string `json:"createdAt,omitempty"`
 	ExternalID *string `json:"externalID,omitempty"`
 	Id *string `json:"id,omitempty"`
-	LockedBalance *map[string]string `json:"lockedBalance,omitempty"`
 	UpdatedAt *string `json:"updatedAt,omitempty"`
 	Version *string `json:"version,omitempty"`
 }
@@ -46,36 +45,36 @@ func NewWalletCreateWalletModelWithDefaults() *WalletCreateWalletModel {
 	return &this
 }
 
-// GetBalance returns the Balance field value if set, zero value otherwise.
-func (o *WalletCreateWalletModel) GetBalance() map[string]string {
-	if o == nil || IsNil(o.Balance) {
-		var ret map[string]string
+// GetBalances returns the Balances field value if set, zero value otherwise.
+func (o *WalletCreateWalletModel) GetBalances() []string {
+	if o == nil || IsNil(o.Balances) {
+		var ret []string
 		return ret
 	}
-	return *o.Balance
+	return o.Balances
 }
 
-// GetBalanceOk returns a tuple with the Balance field value if set, nil otherwise
+// GetBalancesOk returns a tuple with the Balances field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WalletCreateWalletModel) GetBalanceOk() (*map[string]string, bool) {
-	if o == nil || IsNil(o.Balance) {
+func (o *WalletCreateWalletModel) GetBalancesOk() ([]string, bool) {
+	if o == nil || IsNil(o.Balances) {
 		return nil, false
 	}
-	return o.Balance, true
+	return o.Balances, true
 }
 
-// HasBalance returns a boolean if a field has been set.
-func (o *WalletCreateWalletModel) HasBalance() bool {
-	if o != nil && !IsNil(o.Balance) {
+// HasBalances returns a boolean if a field has been set.
+func (o *WalletCreateWalletModel) HasBalances() bool {
+	if o != nil && !IsNil(o.Balances) {
 		return true
 	}
 
 	return false
 }
 
-// SetBalance gets a reference to the given map[string]string and assigns it to the Balance field.
-func (o *WalletCreateWalletModel) SetBalance(v map[string]string) {
-	o.Balance = &v
+// SetBalances gets a reference to the given []string and assigns it to the Balances field.
+func (o *WalletCreateWalletModel) SetBalances(v []string) {
+	o.Balances = v
 }
 
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
@@ -174,38 +173,6 @@ func (o *WalletCreateWalletModel) SetId(v string) {
 	o.Id = &v
 }
 
-// GetLockedBalance returns the LockedBalance field value if set, zero value otherwise.
-func (o *WalletCreateWalletModel) GetLockedBalance() map[string]string {
-	if o == nil || IsNil(o.LockedBalance) {
-		var ret map[string]string
-		return ret
-	}
-	return *o.LockedBalance
-}
-
-// GetLockedBalanceOk returns a tuple with the LockedBalance field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *WalletCreateWalletModel) GetLockedBalanceOk() (*map[string]string, bool) {
-	if o == nil || IsNil(o.LockedBalance) {
-		return nil, false
-	}
-	return o.LockedBalance, true
-}
-
-// HasLockedBalance returns a boolean if a field has been set.
-func (o *WalletCreateWalletModel) HasLockedBalance() bool {
-	if o != nil && !IsNil(o.LockedBalance) {
-		return true
-	}
-
-	return false
-}
-
-// SetLockedBalance gets a reference to the given map[string]string and assigns it to the LockedBalance field.
-func (o *WalletCreateWalletModel) SetLockedBalance(v map[string]string) {
-	o.LockedBalance = &v
-}
-
 // GetUpdatedAt returns the UpdatedAt field value if set, zero value otherwise.
 func (o *WalletCreateWalletModel) GetUpdatedAt() string {
 	if o == nil || IsNil(o.UpdatedAt) {
@@ -280,8 +247,8 @@ func (o WalletCreateWalletModel) MarshalJSON() ([]byte, error) {
 
 func (o WalletCreateWalletModel) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Balance) {
-		toSerialize["balance"] = o.Balance
+	if !IsNil(o.Balances) {
+		toSerialize["balances"] = o.Balances
 	}
 	if !IsNil(o.CreatedAt) {
 		toSerialize["createdAt"] = o.CreatedAt
@@ -291,9 +258,6 @@ func (o WalletCreateWalletModel) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Id) {
 		toSerialize["id"] = o.Id
-	}
-	if !IsNil(o.LockedBalance) {
-		toSerialize["lockedBalance"] = o.LockedBalance
 	}
 	if !IsNil(o.UpdatedAt) {
 		toSerialize["updatedAt"] = o.UpdatedAt

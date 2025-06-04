@@ -451,9 +451,9 @@ const docTemplate = `{
         "wallet.CreateWalletModel": {
             "type": "object",
             "properties": {
-                "balance": {
-                    "type": "object",
-                    "additionalProperties": {
+                "balances": {
+                    "type": "array",
+                    "items": {
                         "type": "string"
                     }
                 },
@@ -465,12 +465,6 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "string"
-                },
-                "lockedBalance": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
                 },
                 "updatedAt": {
                     "type": "string"

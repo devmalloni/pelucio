@@ -297,20 +297,16 @@ components:
       type: object
     wallet.CreateWalletModel:
       properties:
-        balance:
-          additionalProperties:
+        balances:
+          items:
             type: string
-          type: object
+          type: array
         createdAt:
           type: string
         externalID:
           type: string
         id:
           type: string
-        lockedBalance:
-          additionalProperties:
-            type: string
-          type: object
         updatedAt:
           type: string
         version:

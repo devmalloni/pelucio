@@ -4,11 +4,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Balance** | Pointer to **map[string]string** |  | [optional] 
+**Balances** | Pointer to **[]string** |  | [optional] 
 **CreatedAt** | Pointer to **string** |  | [optional] 
 **ExternalID** | Pointer to **string** |  | [optional] 
 **Id** | Pointer to **string** |  | [optional] 
-**LockedBalance** | Pointer to **map[string]string** |  | [optional] 
 **UpdatedAt** | Pointer to **string** |  | [optional] 
 **Version** | Pointer to **string** |  | [optional] 
 
@@ -31,30 +30,30 @@ NewWalletCreateWalletModelWithDefaults instantiates a new WalletCreateWalletMode
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
-### GetBalance
+### GetBalances
 
-`func (o *WalletCreateWalletModel) GetBalance() map[string]string`
+`func (o *WalletCreateWalletModel) GetBalances() []string`
 
-GetBalance returns the Balance field if non-nil, zero value otherwise.
+GetBalances returns the Balances field if non-nil, zero value otherwise.
 
-### GetBalanceOk
+### GetBalancesOk
 
-`func (o *WalletCreateWalletModel) GetBalanceOk() (*map[string]string, bool)`
+`func (o *WalletCreateWalletModel) GetBalancesOk() (*[]string, bool)`
 
-GetBalanceOk returns a tuple with the Balance field if it's non-nil, zero value otherwise
+GetBalancesOk returns a tuple with the Balances field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetBalance
+### SetBalances
 
-`func (o *WalletCreateWalletModel) SetBalance(v map[string]string)`
+`func (o *WalletCreateWalletModel) SetBalances(v []string)`
 
-SetBalance sets Balance field to given value.
+SetBalances sets Balances field to given value.
 
-### HasBalance
+### HasBalances
 
-`func (o *WalletCreateWalletModel) HasBalance() bool`
+`func (o *WalletCreateWalletModel) HasBalances() bool`
 
-HasBalance returns a boolean if a field has been set.
+HasBalances returns a boolean if a field has been set.
 
 ### GetCreatedAt
 
@@ -130,31 +129,6 @@ SetId sets Id field to given value.
 `func (o *WalletCreateWalletModel) HasId() bool`
 
 HasId returns a boolean if a field has been set.
-
-### GetLockedBalance
-
-`func (o *WalletCreateWalletModel) GetLockedBalance() map[string]string`
-
-GetLockedBalance returns the LockedBalance field if non-nil, zero value otherwise.
-
-### GetLockedBalanceOk
-
-`func (o *WalletCreateWalletModel) GetLockedBalanceOk() (*map[string]string, bool)`
-
-GetLockedBalanceOk returns a tuple with the LockedBalance field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetLockedBalance
-
-`func (o *WalletCreateWalletModel) SetLockedBalance(v map[string]string)`
-
-SetLockedBalance sets LockedBalance field to given value.
-
-### HasLockedBalance
-
-`func (o *WalletCreateWalletModel) HasLockedBalance() bool`
-
-HasLockedBalance returns a boolean if a field has been set.
 
 ### GetUpdatedAt
 
