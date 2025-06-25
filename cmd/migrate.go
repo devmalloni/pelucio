@@ -28,17 +28,22 @@ var migrateCmd = &cobra.Command{
 		}
 		defer tx.Rollback()
 
-		_, err = tx.CreateBucket([]byte("Wallets"))
+		_, err = tx.CreateBucketIfNotExists([]byte("Wallets"))
 		if err != nil {
 			panic(err)
 		}
 
-		_, err = tx.CreateBucket([]byte("WalletRecords"))
+		_, err = tx.CreateBucketIfNotExists([]byte("WalletTransactionsExternalIDIndex"))
 		if err != nil {
 			panic(err)
 		}
 
-		_, err = tx.CreateBucket([]byte("WalletTransactions"))
+		_, err = tx.CreateBucketIfNotExists([]byte("WalletRecords"))
+		if err != nil {
+			panic(err)
+		}
+
+		_, err = tx.CreateBucketIfNotExists([]byte("WalletTransactions"))
 		if err != nil {
 			panic(err)
 		}

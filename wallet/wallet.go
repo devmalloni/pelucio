@@ -50,21 +50,10 @@ type (
 
 	WalletTransaction struct {
 		ID            uuid.UUID
+		ExternalID    string
 		WalletRecords []*WalletRecord
 		Status        WalletTransactionStatus
 		CreatedAt     time.Time
-	}
-
-	WalletResponse struct {
-		ID         uuid.UUID `json:"id,omitempty"`
-		ExternalID string    `json:"external_id,omitempty"`
-
-		Balance       map[WalletCurrency]*string `json:"balance,omitempty"`
-		LockedBalance map[WalletCurrency]*string `json:"lockedBalance,omitempty"`
-
-		CreatedAt time.Time  `json:"createdAt,omitempty"`
-		UpdatedAt *time.Time `json:"updatedAt,omitempty"`
-		Version   uuid.UUID  `json:"version,omitempty"`
 	}
 )
 
@@ -146,7 +135,7 @@ func (p *Wallet) Apply(records ...*WalletRecord) error {
 			currentLockedBalance.Sub(currentLockedBalance, records[i].Value)
 			currentBalance.Add(currentBalance, records[i].Value)
 		default:
-			panic("")
+			panic("unknown record kind")
 		}
 	}
 
@@ -175,38 +164,14 @@ func (p *Wallet) balanceOf(currencyMap map[WalletCurrency]*big.Int, currency Wal
 	return new(big.Int).Set(c)
 }
 
-func (p *Wallet) ToWalletResponse() *WalletResponse {
-	balance := make(map[WalletCurrency]*string)
-	lockedBalance := make(map[WalletCurrency]*string)
-
-	for k, v := range p.Balance {
-		vv := v.String()
-		balance[k] = &vv
-	}
-
-	for k, v := range p.LockedBalance {
-		vv := v.String()
-		lockedBalance[k] = &vv
-	}
-
-	return &WalletResponse{
-		ID:            p.ID,
-		Version:       p.Version,
-		CreatedAt:     p.CreatedAt,
-		UpdatedAt:     p.UpdatedAt,
-		Balance:       balance,
-		LockedBalance: lockedBalance,
-		ExternalID:    p.ExternalID,
-	}
-}
-
 func (p *WalletRecord) Apply() error {
 	return p.Wallet.Apply(p)
 }
 
-func NewTransaction(records ...*WalletRecord) *WalletTransaction {
+func NewTransaction(externalID string, records ...*WalletRecord) *WalletTransaction {
 	return &WalletTransaction{
 		ID:            uuid.NewV4(),
+		ExternalID:    externalID,
 		WalletRecords: records,
 		Status:        Pending,
 		CreatedAt:     time.Now(),
@@ -214,6 +179,10 @@ func NewTransaction(records ...*WalletRecord) *WalletTransaction {
 }
 
 func (p *WalletTransaction) Apply() error {
+	if p.ExternalID == "" {
+		return errors.New("transaction external id is mandatory")
+	}
+
 	for i := range p.WalletRecords {
 		if err := p.WalletRecords[i].Apply(); err != nil {
 			return err

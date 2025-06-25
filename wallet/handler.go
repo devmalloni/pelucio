@@ -44,6 +44,18 @@ type (
 		UpdatedAt *time.Time `json:"updatedAt,omitempty"`
 		Version   uuid.UUID  `json:"version,omitempty"`
 	}
+
+	WalletResponse struct {
+		ID         uuid.UUID `json:"id,omitempty"`
+		ExternalID string    `json:"external_id,omitempty"`
+
+		Balance       map[WalletCurrency]*string `json:"balance,omitempty"`
+		LockedBalance map[WalletCurrency]*string `json:"lockedBalance,omitempty"`
+
+		CreatedAt time.Time  `json:"createdAt,omitempty"`
+		UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+		Version   uuid.UUID  `json:"version,omitempty"`
+	}
 )
 
 func NewHandler(d handlerDependencies) *Handler {
@@ -459,4 +471,29 @@ func (p *Handler) RegisterAdminRoutes(r *gin.RouterGroup) {
 	r.POST("/wallet/:id/unlockandburn", xerrors.HandleWithError(p.UnlockAndBurn))
 	r.POST("/wallet", xerrors.HandleWithError(p.CreateWallet))
 	r.GET("/wallets", xerrors.HandleWithError(p.GetWallets))
+}
+
+func (p *Wallet) ToWalletResponse() *WalletResponse {
+	balance := make(map[WalletCurrency]*string)
+	lockedBalance := make(map[WalletCurrency]*string)
+
+	for k, v := range p.Balance {
+		vv := v.String()
+		balance[k] = &vv
+	}
+
+	for k, v := range p.LockedBalance {
+		vv := v.String()
+		lockedBalance[k] = &vv
+	}
+
+	return &WalletResponse{
+		ID:            p.ID,
+		Version:       p.Version,
+		CreatedAt:     p.CreatedAt,
+		UpdatedAt:     p.UpdatedAt,
+		Balance:       balance,
+		LockedBalance: lockedBalance,
+		ExternalID:    p.ExternalID,
+	}
 }

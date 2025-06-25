@@ -36,6 +36,7 @@ func (p *Persister) SaveWallet(ctx context.Context, w []*wallet.Wallet, r []*wal
 		wb := tx.Bucket([]byte("Wallets"))
 		rb := tx.Bucket([]byte("WalletRecords"))
 		tb := tx.Bucket([]byte("WalletTransactions"))
+		transactionIndexes := tx.Bucket([]byte("WalletTransactionsExternalIDIndex"))
 		for _, wallet := range w {
 			walletjson, err := json.Marshal(wallet)
 			if err != nil {
@@ -60,6 +61,16 @@ func (p *Persister) SaveWallet(ctx context.Context, w []*wallet.Wallet, r []*wal
 		}
 
 		for _, data := range t {
+			tID := transactionIndexes.Get([]byte(data.ExternalID))
+			if tID != nil {
+				return wallet.ErrDuplicatedKey
+			}
+
+			err := transactionIndexes.Put([]byte(data.ExternalID), []byte(data.ExternalID))
+			if err != nil {
+				return err
+			}
+
 			datajson, err := json.Marshal(data)
 			if err != nil {
 				return err

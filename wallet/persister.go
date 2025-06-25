@@ -2,8 +2,13 @@ package wallet
 
 import (
 	"context"
+	"errors"
 
 	uuid "github.com/satori/go.uuid"
+)
+
+var (
+	ErrDuplicatedKey = errors.New("duplicate key found")
 )
 
 type (
