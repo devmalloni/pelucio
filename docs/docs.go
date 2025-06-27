@@ -93,6 +93,9 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -359,6 +362,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/open/wallet/unlockandtransfer": {
+            "post": {
+                "description": "unlock funds and transfer from one wallet to another",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wallet"
+                ],
+                "summary": "UnlockAndTransfer Transaction",
+                "parameters": [
+                    {
+                        "description": "Transfer data",
+                        "name": "model",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/wallet.TransferModel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
         "/v1/open/wallet/{id}": {
             "get": {
                 "description": "Get wallet infos by ID",
@@ -445,6 +482,9 @@ const docTemplate = `{
                 },
                 "currency": {
                     "type": "string"
+                },
+                "transactionExternaID": {
+                    "type": "string"
                 }
             }
         },
@@ -487,6 +527,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "toWalletID": {
+                    "type": "string"
+                },
+                "transactionExternalID": {
                     "type": "string"
                 }
             }

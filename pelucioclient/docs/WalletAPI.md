@@ -15,6 +15,7 @@ Method | HTTP request | Description
 [**V1OpenWalletIdGet**](WalletAPI.md#V1OpenWalletIdGet) | **Get** /v1/open/wallet/{id} | Get Wallet
 [**V1OpenWalletIdRecordsGet**](WalletAPI.md#V1OpenWalletIdRecordsGet) | **Get** /v1/open/wallet/{id}/records | Get Wallet records
 [**V1OpenWalletTransferPost**](WalletAPI.md#V1OpenWalletTransferPost) | **Post** /v1/open/wallet/transfer | Transfer Transaction
+[**V1OpenWalletUnlockandtransferPost**](WalletAPI.md#V1OpenWalletUnlockandtransferPost) | **Post** /v1/open/wallet/unlockandtransfer | UnlockAndTransfer Transaction
 
 
 
@@ -745,6 +746,70 @@ func main() {
 ### Other Parameters
 
 Other parameters are passed through a pointer to a apiV1OpenWalletTransferPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **model** | [**WalletTransferModel**](WalletTransferModel.md) | Transfer data | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## V1OpenWalletUnlockandtransferPost
+
+> V1OpenWalletUnlockandtransferPost(ctx).Model(model).Execute()
+
+UnlockAndTransfer Transaction
+
+
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	model := *openapiclient.NewWalletTransferModel() // WalletTransferModel | Transfer data
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	r, err := apiClient.WalletAPI.V1OpenWalletUnlockandtransferPost(context.Background()).Model(model).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `WalletAPI.V1OpenWalletUnlockandtransferPost``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiV1OpenWalletUnlockandtransferPostRequest struct via the builder pattern
 
 
 Name | Type | Description  | Notes

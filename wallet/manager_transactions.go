@@ -356,3 +356,36 @@ func (p *Manager) Trade(ctx context.Context,
 
 	return nil
 }
+
+func (p *Manager) UnlockAndTransfer(ctx context.Context, transactionExternalID string, fromWalletID uuid.UUID, toWalletID uuid.UUID, amount *big.Int, currency WalletCurrency) error {
+	p.l.Lock()
+	defer p.l.Unlock()
+
+	fromWallet, err := p.d.WalletPersister().FindWalletByID(ctx, fromWalletID)
+	if err != nil {
+		return err
+	}
+
+	toWallet, err := p.d.WalletPersister().FindWalletByID(ctx, toWalletID)
+	if err != nil {
+		return err
+	}
+
+	runlock := fromWallet.Unlock(amount, currency)
+	rsub := fromWallet.Sub(amount, currency)
+	radd := toWallet.Add(amount, currency)
+
+	t := NewTransaction(transactionExternalID, runlock, rsub, radd)
+
+	err = t.Apply()
+	if err != nil {
+		return err
+	}
+
+	err = p.d.WalletPersister().SaveWallet(ctx, []*Wallet{fromWallet, toWallet}, []*WalletRecord{radd, rsub}, []*WalletTransaction{t})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

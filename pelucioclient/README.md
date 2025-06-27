@@ -90,6 +90,7 @@ Class | Method | HTTP request | Description
 *WalletAPI* | [**V1OpenWalletIdGet**](docs/WalletAPI.md#v1openwalletidget) | **Get** /v1/open/wallet/{id} | Get Wallet
 *WalletAPI* | [**V1OpenWalletIdRecordsGet**](docs/WalletAPI.md#v1openwalletidrecordsget) | **Get** /v1/open/wallet/{id}/records | Get Wallet records
 *WalletAPI* | [**V1OpenWalletTransferPost**](docs/WalletAPI.md#v1openwallettransferpost) | **Post** /v1/open/wallet/transfer | Transfer Transaction
+*WalletAPI* | [**V1OpenWalletUnlockandtransferPost**](docs/WalletAPI.md#v1openwalletunlockandtransferpost) | **Post** /v1/open/wallet/unlockandtransfer | UnlockAndTransfer Transaction
 
 
 ## Documentation For Models

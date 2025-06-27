@@ -26,14 +26,16 @@ type (
 		d handlerDependencies
 	}
 	TransferModel struct {
-		FromWalletID uuid.UUID
-		ToWalletID   uuid.UUID
-		Amount       *string
-		Currency     string
+		FromWalletID          uuid.UUID `json:"fromWalletID,omitempty"`
+		ToWalletID            uuid.UUID `json:"toWalletID,omitempty"`
+		Amount                *string   `json:"amount,omitempty"`
+		Currency              string    `json:"currency,omitempty"`
+		TransactionExternalID string    `json:"transactionExternalID,omitempty"`
 	}
 	AmountModel struct {
-		Amount   *string `json:"amount,omitempty"`
-		Currency string  `json:"currency,omitempty"`
+		Amount                *string `json:"amount,omitempty"`
+		Currency              string  `json:"currency,omitempty"`
+		TransactionExternalID string  `json:"transactionExternaID,omitempty"`
 	}
 	CreateWalletModel struct {
 		ID         *uuid.UUID `json:"id,omitempty"`
@@ -86,7 +88,7 @@ func (p *Handler) Transfer(c *gin.Context) error {
 		return ErrBadRequest.WithDescription("Cannot cast amount string to big.Int")
 	}
 
-	return p.d.WalletManager().Transfer(c, t.FromWalletID, t.ToWalletID, amount, WalletCurrency(t.Currency))
+	return p.d.WalletManager().Transfer(c, t.TransactionExternalID, t.FromWalletID, t.ToWalletID, amount, WalletCurrency(t.Currency))
 }
 
 // GetWallet godoc
@@ -202,6 +204,7 @@ func (p *Handler) WalletRecords(c *gin.Context) error {
 // @Param      			model     		body   		AmountModel 		true	"Amount model"
 // @Success      		200
 // @Failure      		400
+// @Failure      		500
 // @Router       		/v1/admin/wallet/{id}/burn [post]
 func (p *Handler) Burn(c *gin.Context) error {
 	var b AmountModel
@@ -222,7 +225,7 @@ func (p *Handler) Burn(c *gin.Context) error {
 		return ErrBadRequest.WithDescription("Cannot cast amount string to big.Int")
 	}
 
-	return p.d.WalletManager().Burn(c, uuid.FromStringOrNil(wID), amount, WalletCurrency(b.Currency))
+	return p.d.WalletManager().Burn(c, b.TransactionExternalID, uuid.FromStringOrNil(wID), amount, WalletCurrency(b.Currency))
 }
 
 // Mint godoc
@@ -255,7 +258,7 @@ func (p *Handler) Mint(c *gin.Context) error {
 		return ErrBadRequest.WithDescription("Cannot cast amount string to big.Int")
 	}
 
-	return p.d.WalletManager().Mint(c, uuid.FromStringOrNil(wID), amount, WalletCurrency(m.Currency))
+	return p.d.WalletManager().Mint(c, m.TransactionExternalID, uuid.FromStringOrNil(wID), amount, WalletCurrency(m.Currency))
 }
 
 // Lock godoc
@@ -288,7 +291,7 @@ func (p *Handler) Lock(c *gin.Context) error {
 		return ErrBadRequest.WithDescription("Cannot cast amount string to big.Int")
 	}
 
-	return p.d.WalletManager().Lock(c, uuid.FromStringOrNil(wID), amount, WalletCurrency(m.Currency))
+	return p.d.WalletManager().Lock(c, m.TransactionExternalID, uuid.FromStringOrNil(wID), amount, WalletCurrency(m.Currency))
 }
 
 // Unlock godoc
@@ -321,7 +324,7 @@ func (p *Handler) Unlock(c *gin.Context) error {
 		return ErrBadRequest.WithDescription("Cannot cast amount string to big.Int")
 	}
 
-	return p.d.WalletManager().Unlock(c, uuid.FromStringOrNil(wID), amount, WalletCurrency(m.Currency))
+	return p.d.WalletManager().Unlock(c, m.TransactionExternalID, uuid.FromStringOrNil(wID), amount, WalletCurrency(m.Currency))
 }
 
 // MintAndLock godoc
@@ -354,7 +357,32 @@ func (p *Handler) MintAndLock(c *gin.Context) error {
 		return ErrBadRequest.WithDescription("Cannot cast amount string to big.Int")
 	}
 
-	return p.d.WalletManager().MintAndLock(c, uuid.FromStringOrNil(wID), amount, WalletCurrency(m.Currency))
+	return p.d.WalletManager().MintAndLock(c, m.TransactionExternalID, uuid.FromStringOrNil(wID), amount, WalletCurrency(m.Currency))
+}
+
+// UnlockAndTransfer godoc
+// @Summary      		UnlockAndTransfer Transaction
+// @Description  		unlock funds and transfer from one wallet to another
+// @Tags         		wallet
+// @Accept       		json
+// @Produce      		json
+// @Param      			model     		body   		TransferModel 		true	"Transfer data"
+// @Success      		200
+// @Failure      		400
+// @Router       		/v1/open/wallet/unlockandtransfer [post]
+func (p *Handler) UnlockAndTransfer(c *gin.Context) error {
+	var t TransferModel
+	err := c.BindJSON(&t)
+	if err != nil {
+		return err
+	}
+
+	amount, ok := new(big.Int).SetString(*t.Amount, 10)
+	if !ok {
+		return ErrBadRequest.WithDescription("Cannot cast amount string to big.Int")
+	}
+
+	return p.d.WalletManager().UnlockAndTransfer(c, t.TransactionExternalID, t.FromWalletID, t.ToWalletID, amount, WalletCurrency(t.Currency))
 }
 
 // UnlockAndBurn godoc
@@ -387,7 +415,7 @@ func (p *Handler) UnlockAndBurn(c *gin.Context) error {
 		return ErrBadRequest.WithDescription("Cannot cast amount string to big.Int")
 	}
 
-	return p.d.WalletManager().UnlockAndBurn(c, uuid.FromStringOrNil(wID), amount, WalletCurrency(m.Currency))
+	return p.d.WalletManager().UnlockAndBurn(c, m.TransactionExternalID, uuid.FromStringOrNil(wID), amount, WalletCurrency(m.Currency))
 }
 
 // CreateWallet godoc
@@ -457,6 +485,7 @@ func (p *Handler) CreateWallet(c *gin.Context) error {
 
 func (p *Handler) RegisterOpenRoutes(r *gin.RouterGroup) {
 	r.POST("/wallet/transfer", xerrors.HandleWithError(p.Transfer))
+	r.POST("/wallet/unlockandtransfer", xerrors.HandleWithError(p.UnlockAndTransfer))
 	r.GET("/wallet/:id", xerrors.HandleWithError(p.WalletByID))
 	r.GET("/wallet/external/:id", xerrors.HandleWithError(p.WalletByExternalID))
 	r.GET("/wallet/:id/records", xerrors.HandleWithError(p.WalletRecords))

@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **Currency** | Pointer to **string** |  | [optional] 
 **FromWalletID** | Pointer to **string** |  | [optional] 
 **ToWalletID** | Pointer to **string** |  | [optional] 
+**TransactionExternalID** | Pointer to **string** |  | [optional] 
 
 ## Methods
 
@@ -127,6 +128,31 @@ SetToWalletID sets ToWalletID field to given value.
 `func (o *WalletTransferModel) HasToWalletID() bool`
 
 HasToWalletID returns a boolean if a field has been set.
+
+### GetTransactionExternalID
+
+`func (o *WalletTransferModel) GetTransactionExternalID() string`
+
+GetTransactionExternalID returns the TransactionExternalID field if non-nil, zero value otherwise.
+
+### GetTransactionExternalIDOk
+
+`func (o *WalletTransferModel) GetTransactionExternalIDOk() (*string, bool)`
+
+GetTransactionExternalIDOk returns a tuple with the TransactionExternalID field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetTransactionExternalID
+
+`func (o *WalletTransferModel) SetTransactionExternalID(v string)`
+
+SetTransactionExternalID sets TransactionExternalID field to given value.
+
+### HasTransactionExternalID
+
+`func (o *WalletTransferModel) HasTransactionExternalID() bool`
+
+HasTransactionExternalID returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

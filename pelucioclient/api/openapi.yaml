@@ -58,6 +58,9 @@ paths:
         "400":
           content: {}
           description: Bad Request
+        "500":
+          content: {}
+          description: Internal Server Error
       summary: Burn Transaction
       tags:
       - wallet
@@ -284,6 +287,27 @@ paths:
       tags:
       - wallet
       x-codegen-request-body-name: model
+  /v1/open/wallet/unlockandtransfer:
+    post:
+      description: unlock funds and transfer from one wallet to another
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/wallet.TransferModel'
+        description: Transfer data
+        required: true
+      responses:
+        "200":
+          content: {}
+          description: OK
+        "400":
+          content: {}
+          description: Bad Request
+      summary: UnlockAndTransfer Transaction
+      tags:
+      - wallet
+      x-codegen-request-body-name: model
 components:
   schemas:
     big.Int:
@@ -293,6 +317,8 @@ components:
         amount:
           type: string
         currency:
+          type: string
+        transactionExternaID:
           type: string
       type: object
     wallet.CreateWalletModel:
@@ -321,6 +347,8 @@ components:
         fromWalletID:
           type: string
         toWalletID:
+          type: string
+        transactionExternalID:
           type: string
       type: object
     wallet.Wallet:

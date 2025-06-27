@@ -24,6 +24,7 @@ type WalletTransferModel struct {
 	Currency *string `json:"currency,omitempty"`
 	FromWalletID *string `json:"fromWalletID,omitempty"`
 	ToWalletID *string `json:"toWalletID,omitempty"`
+	TransactionExternalID *string `json:"transactionExternalID,omitempty"`
 }
 
 // NewWalletTransferModel instantiates a new WalletTransferModel object
@@ -171,6 +172,38 @@ func (o *WalletTransferModel) SetToWalletID(v string) {
 	o.ToWalletID = &v
 }
 
+// GetTransactionExternalID returns the TransactionExternalID field value if set, zero value otherwise.
+func (o *WalletTransferModel) GetTransactionExternalID() string {
+	if o == nil || IsNil(o.TransactionExternalID) {
+		var ret string
+		return ret
+	}
+	return *o.TransactionExternalID
+}
+
+// GetTransactionExternalIDOk returns a tuple with the TransactionExternalID field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WalletTransferModel) GetTransactionExternalIDOk() (*string, bool) {
+	if o == nil || IsNil(o.TransactionExternalID) {
+		return nil, false
+	}
+	return o.TransactionExternalID, true
+}
+
+// HasTransactionExternalID returns a boolean if a field has been set.
+func (o *WalletTransferModel) HasTransactionExternalID() bool {
+	if o != nil && !IsNil(o.TransactionExternalID) {
+		return true
+	}
+
+	return false
+}
+
+// SetTransactionExternalID gets a reference to the given string and assigns it to the TransactionExternalID field.
+func (o *WalletTransferModel) SetTransactionExternalID(v string) {
+	o.TransactionExternalID = &v
+}
+
 func (o WalletTransferModel) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -192,6 +225,9 @@ func (o WalletTransferModel) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.ToWalletID) {
 		toSerialize["toWalletID"] = o.ToWalletID
+	}
+	if !IsNil(o.TransactionExternalID) {
+		toSerialize["transactionExternalID"] = o.TransactionExternalID
 	}
 	return toSerialize, nil
 }

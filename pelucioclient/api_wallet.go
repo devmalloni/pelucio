@@ -178,6 +178,19 @@ type WalletAPI interface {
 
 	// V1OpenWalletTransferPostExecute executes the request
 	V1OpenWalletTransferPostExecute(r WalletAPIV1OpenWalletTransferPostRequest) (*http.Response, error)
+
+	/*
+	V1OpenWalletUnlockandtransferPost UnlockAndTransfer Transaction
+
+	unlock funds and transfer from one wallet to another
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return WalletAPIV1OpenWalletUnlockandtransferPostRequest
+	*/
+	V1OpenWalletUnlockandtransferPost(ctx context.Context) WalletAPIV1OpenWalletUnlockandtransferPostRequest
+
+	// V1OpenWalletUnlockandtransferPostExecute executes the request
+	V1OpenWalletUnlockandtransferPostExecute(r WalletAPIV1OpenWalletUnlockandtransferPostRequest) (*http.Response, error)
 }
 
 // WalletAPIService WalletAPI service
@@ -1267,6 +1280,106 @@ func (a *WalletAPIService) V1OpenWalletTransferPostExecute(r WalletAPIV1OpenWall
 	}
 
 	localVarPath := localBasePath + "/v1/open/wallet/transfer"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.model == nil {
+		return nil, reportError("model is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.model
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
+type WalletAPIV1OpenWalletUnlockandtransferPostRequest struct {
+	ctx context.Context
+	ApiService WalletAPI
+	model *WalletTransferModel
+}
+
+// Transfer data
+func (r WalletAPIV1OpenWalletUnlockandtransferPostRequest) Model(model WalletTransferModel) WalletAPIV1OpenWalletUnlockandtransferPostRequest {
+	r.model = &model
+	return r
+}
+
+func (r WalletAPIV1OpenWalletUnlockandtransferPostRequest) Execute() (*http.Response, error) {
+	return r.ApiService.V1OpenWalletUnlockandtransferPostExecute(r)
+}
+
+/*
+V1OpenWalletUnlockandtransferPost UnlockAndTransfer Transaction
+
+unlock funds and transfer from one wallet to another
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return WalletAPIV1OpenWalletUnlockandtransferPostRequest
+*/
+func (a *WalletAPIService) V1OpenWalletUnlockandtransferPost(ctx context.Context) WalletAPIV1OpenWalletUnlockandtransferPostRequest {
+	return WalletAPIV1OpenWalletUnlockandtransferPostRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+func (a *WalletAPIService) V1OpenWalletUnlockandtransferPostExecute(r WalletAPIV1OpenWalletUnlockandtransferPostRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WalletAPIService.V1OpenWalletUnlockandtransferPost")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/v1/open/wallet/unlockandtransfer"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
