@@ -1,6 +1,0 @@
-disallowAdditionalPropertiesIfNotPresent: true
-packageName: pelucioclient
-generateInterfaces: true
-isGoSubmodule: false
-structPrefix: true
-enumClassPrefix: true

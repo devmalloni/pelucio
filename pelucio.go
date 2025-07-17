@@ -1,0 +1,192 @@
+package pelucio
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"pelucio/x/xmap"
+	"pelucio/x/xtime"
+	"pelucio/x/xuuid"
+
+	"github.com/gofrs/uuid/v5"
+)
+
+var (
+	ErrRequiredAccountID = errors.New("account ID cannot be empty")
+	ErrTransactionNil    = errors.New("transaction cannot be nil")
+)
+
+type Pelucio struct {
+	readWriter ReadWriter
+	clock      xtime.Clock
+}
+
+func NewPelucio(opts ...PelucionOpt) *Pelucio {
+	p := &Pelucio{
+		clock: xtime.StdClock{},
+	}
+
+	for _, opt := range opts {
+		opt(p)
+	}
+
+	return p
+}
+
+func (p *Pelucio) CreateAccount(ctx context.Context,
+	externalID,
+	name string,
+	normalSide EntrySide,
+	metadata json.RawMessage) error {
+	account := NewAccount(externalID, name, normalSide, metadata, p.clock)
+
+	_, err := p.readWriter.ReadAccountByExternalID(ctx, externalID)
+	if err != nil && err != ErrNotFound {
+		return err
+	}
+
+	err = p.readWriter.WriteAccount(ctx, account, false)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *Pelucio) DeleteAccount(ctx context.Context, accountID string) error {
+	account, err := p.readWriter.ReadAccount(ctx, accountID)
+	if err != nil {
+		return err
+	}
+
+	err = account.Delete(p.clock)
+	if err != nil {
+		return err
+	}
+
+	err = p.readWriter.WriteAccount(ctx, account, true)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *Pelucio) UpdateAccount(ctx context.Context, accountID, name string, metadata json.RawMessage) error {
+	account, err := p.readWriter.ReadAccount(ctx, accountID)
+	if err != nil {
+		return err
+	}
+
+	account.UpdateData(name, metadata, p.clock)
+
+	err = p.readWriter.WriteAccount(ctx, account, true)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *Pelucio) FindAccounts(ctx context.Context, query ReadAccountFilter) ([]*Account, error) {
+	return p.readWriter.ReadAccounts(ctx, query)
+}
+
+func (p *Pelucio) FindAccountByID(ctx context.Context, accountID string) (*Account, error) {
+	return p.readWriter.ReadAccount(ctx, accountID)
+}
+
+func (p *Pelucio) FindAccountByExternalID(ctx context.Context, externalID string) (*Account, error) {
+	return p.readWriter.ReadAccountByExternalID(ctx, externalID)
+}
+
+func (p *Pelucio) BalanceOf(ctx context.Context, accountID string) (Balance, error) {
+	account, err := p.readWriter.ReadAccount(ctx, accountID)
+	if err != nil {
+		return nil, err
+	}
+
+	return account.Balance, nil
+}
+
+func (p *Pelucio) BalanceOfAccountFromLedger(ctx context.Context, accountID string) (*Account, error) {
+	if accountID == "" {
+		return nil, ErrRequiredAccountID
+	}
+
+	account, err := p.FindAccountByID(ctx, accountID)
+	if err != nil {
+		return nil, err
+	}
+
+	entries, err := p.readWriter.ReadEntriesOfAccount(ctx, accountID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = account.ComputeFromEntries(entries, p.clock)
+	if err != nil {
+		return nil, err
+	}
+
+	return account, nil
+}
+
+func (p *Pelucio) ExecuteTransaction(ctx context.Context, transaction *Transaction) error {
+	if transaction == nil {
+		return ErrTransactionNil
+	}
+
+	accounts, err := p.FindAccounts(ctx, ReadAccountFilter{
+		AccountIDs: xuuid.ToStrings(transaction.Accounts()...),
+	})
+	if err != nil {
+		return err
+	}
+
+	accountMap := xmap.ToMap(accounts, func(a *Account) uuid.UUID {
+		return a.ID
+	})
+
+	err = transaction.ApplyToAccounts(accountMap)
+	if err != nil {
+		return err
+	}
+
+	accounts = xmap.Values(accountMap)
+
+	return p.readWriter.WriteTransaction(ctx, transaction, accounts...)
+}
+
+func (p *Pelucio) RevertTransaction(ctx context.Context, originalTransactionID string) error {
+	originalTransaction, err := p.readWriter.ReadTransaction(ctx, originalTransactionID)
+	if err != nil {
+		return err
+	}
+
+	// TODO: external ID
+	externalId := fmt.Sprintf("%s-%s", originalTransaction.ExternalID, "revert")
+	revertTransaction := originalTransaction.
+		Reverse(externalId,
+			fmt.Sprintf("reverted transaction %s", originalTransactionID), p.clock)
+
+	err = p.ExecuteTransaction(ctx, revertTransaction)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *Pelucio) EntriesOfAccount(ctx context.Context, accountID string) ([]*Entry, error) {
+	if accountID == "" {
+		return nil, ErrRequiredAccountID
+	}
+
+	return p.readWriter.ReadEntriesOfAccount(ctx, accountID)
+}
+
+func (p *Pelucio) FindEntries(ctx context.Context, filter ReadEntryFilter) ([]*Entry, error) {
+	return p.readWriter.ReadEntries(ctx, filter)
+}
