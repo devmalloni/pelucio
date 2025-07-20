@@ -44,6 +44,7 @@ func NewAccount(externalID,
 		Name:       name,
 		NormalSide: normalSide,
 		Metadata:   metadata,
+		Balance:    make(Balance),
 		Version:    clock.Now().UnixNano(),
 		CreatedAt:  clock.Now(),
 	}

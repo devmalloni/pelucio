@@ -74,7 +74,7 @@ func (p *Transaction) IsBalanced() bool {
 }
 
 func (p *Transaction) ApplyToAccounts(accounts map[uuid.UUID]*Account) error {
-	if accounts == nil {
+	if len(accounts) == 0 {
 		return ErrNoAccountProvided
 	}
 
@@ -105,7 +105,7 @@ func (p *Transaction) ApplyToAccounts(accounts map[uuid.UUID]*Account) error {
 }
 
 func (p *Transaction) Accounts() []uuid.UUID {
-	accounts := make([]uuid.UUID, len(p.Entries))
+	accounts := make([]uuid.UUID, 0)
 
 	for _, entry := range p.Entries {
 		accounts = append(accounts, entry.AccountID)

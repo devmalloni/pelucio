@@ -19,18 +19,14 @@ func ComputeLedger(transactions []*Transaction) (*Ledger, error) {
 		ID: xuuid.New(),
 	}
 
-	balances, isBalanced, err := l.compute(transactions)
-	if err != nil {
-		return nil, err
-	}
-
+	balances, isBalanced := l.compute(transactions)
 	l.BalancesOfAccounts = balances
 	l.Isbalanced = isBalanced
 
 	return l, nil
 }
 
-func (p *Ledger) compute(transactions []*Transaction) (map[uuid.UUID]Balance, bool, error) {
+func (p *Ledger) compute(transactions []*Transaction) (map[uuid.UUID]Balance, bool) {
 	balancesPerAccount := make(map[uuid.UUID]Balance)
 	isBalanced := true
 	for _, transaction := range transactions {
@@ -38,5 +34,5 @@ func (p *Ledger) compute(transactions []*Transaction) (map[uuid.UUID]Balance, bo
 		isBalanced = isBalanced && transaction.IsBalanced()
 	}
 
-	return balancesPerAccount, isBalanced, nil
+	return balancesPerAccount, isBalanced
 }

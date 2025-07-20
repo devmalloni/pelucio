@@ -7,6 +7,33 @@ import (
 	"time"
 )
 
+func TestEntry_Apply_ErrNilBalance(t *testing.T) {
+	entry := Entry{}
+
+	err := entry.Apply(nil)
+	if err != ErrNilBalance {
+		t.Fatalf("expected error ErrNilBalance")
+	}
+}
+
+func TestEntry_Apply_ErrOnAdd(t *testing.T) {
+	entry := Entry{
+		ID:          xuuid.MustParseString("6b3f5a20-4721-4cb5-8046-4af41e319736"),
+		AccountID:   xuuid.MustParseString("cf1cdd05-3311-4e6b-8dbc-e0b0bcb59bde"),
+		EntrySide:   Debit,
+		AccountSide: Debit,
+		Amount:      big.NewInt(-100),
+		Currency:    "USD",
+		CreatedAt:   time.Now(),
+	}
+
+	balance := Balance{}
+	err := entry.Apply(balance)
+	if err == nil {
+		t.Fatalf("expected error on add operation. got nil")
+	}
+}
+
 func TestEntry_Apply_DebitEntry_DebitAccount(t *testing.T) {
 	balance := make(Balance)
 
@@ -242,6 +269,23 @@ func TestEntry_OperationOnBalance(t *testing.T) {
 	}
 }
 
+func TestEntry_OperationOnBalance_Invalid(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("The code did not panic as expected")
+		} else if r != "invalid entry side or account side" {
+			t.Errorf("Unexpected panic value: %v", r)
+		}
+	}()
+
+	debitOnCreditAccountEntry := Entry{
+		EntrySide:   "foo",
+		AccountSide: "bar",
+	}
+
+	debitOnCreditAccountEntry.OperationOnBalance()
+}
+
 func TestEntry_Reverse_CreditAccount_DebitSide(t *testing.T) {
 	originalEntry := Entry{
 		ID:            xuuid.MustParseString("63e11bba-3daf-44a7-a263-399a665ab699"),
@@ -458,5 +502,13 @@ func TestBalance_HasBalance(t *testing.T) {
 
 	if !b.HasBalance() {
 		t.Fatalf("expected has balance to be true")
+	}
+}
+
+func TestBalance_HasBalance_EmptyBalance(t *testing.T) {
+	b := Balance{}
+
+	if b.HasBalance() {
+		t.Fatalf("expected has balance to be false")
 	}
 }

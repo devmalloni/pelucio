@@ -2,6 +2,8 @@ package xtime
 
 import "time"
 
+var DefaultClock = &StdClock{}
+
 type Clock interface {
 	Now() time.Time
 	NilNow() *time.Time
