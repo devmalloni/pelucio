@@ -231,7 +231,7 @@ func TestPelucio_DeleteAccount_AccountWithBalance(t *testing.T) {
 
 	readWriter.
 		On("ReadAccount", account.ID).
-		Return(nil, ErrNotFound)
+		Return(account, nil)
 
 	err := pelucio.DeleteAccount(context.Background(), account.ID)
 
@@ -372,6 +372,26 @@ func TestPelucio_BalanceOf(t *testing.T) {
 
 	if balance["BRL"].Cmp(account.Balance["BRL"]) != 0 {
 		t.Errorf("expected currency brl to have 1. got %v", balance["BRL"])
+	}
+
+	if !readWriter.AssertExpectations(t) {
+		t.Errorf("mock expected calls not occurred")
+	}
+}
+
+func TestPelucio_BalanceOf_AccountNotFound(t *testing.T) {
+	readWriter := new(ReadWriterMock)
+	pelucio := NewPelucio(WithReadWriter(readWriter), WithClock(xtime.DefaultClock))
+
+	account := NewAccount("external_id", "name", Debit, nil, xtime.DefaultClock)
+	readWriter.
+		On("ReadAccount", account.ID).
+		Return(nil, ErrNotFound)
+
+	_, err := pelucio.BalanceOf(context.Background(), account.ID)
+
+	if err != ErrNotFound {
+		t.Fatalf("expected ErrNotFound. got %v", err)
 	}
 
 	if !readWriter.AssertExpectations(t) {
