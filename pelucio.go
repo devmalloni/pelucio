@@ -13,8 +13,9 @@ import (
 )
 
 var (
-	ErrRequiredAccountID = errors.New("account ID cannot be empty")
-	ErrTransactionNil    = errors.New("transaction cannot be nil")
+	ErrExternalIDAlreadyInUse = errors.New("external id already in use")
+	ErrRequiredAccountID      = errors.New("account ID cannot be empty")
+	ErrTransactionNil         = errors.New("transaction cannot be nil")
 )
 
 type Pelucio struct {
@@ -46,6 +47,10 @@ func (p *Pelucio) CreateAccount(ctx context.Context,
 		return err
 	}
 
+	if err == nil {
+		return ErrExternalIDAlreadyInUse
+	}
+
 	err = p.readWriter.WriteAccount(ctx, account, false)
 	if err != nil {
 		return err
@@ -54,7 +59,7 @@ func (p *Pelucio) CreateAccount(ctx context.Context,
 	return nil
 }
 
-func (p *Pelucio) DeleteAccount(ctx context.Context, accountID string) error {
+func (p *Pelucio) DeleteAccount(ctx context.Context, accountID uuid.UUID) error {
 	account, err := p.readWriter.ReadAccount(ctx, accountID)
 	if err != nil {
 		return err
@@ -73,7 +78,7 @@ func (p *Pelucio) DeleteAccount(ctx context.Context, accountID string) error {
 	return nil
 }
 
-func (p *Pelucio) UpdateAccount(ctx context.Context, accountID, name string, metadata json.RawMessage) error {
+func (p *Pelucio) UpdateAccount(ctx context.Context, accountID uuid.UUID, name string, metadata json.RawMessage) error {
 	account, err := p.readWriter.ReadAccount(ctx, accountID)
 	if err != nil {
 		return err
@@ -93,7 +98,7 @@ func (p *Pelucio) FindAccounts(ctx context.Context, query ReadAccountFilter) ([]
 	return p.readWriter.ReadAccounts(ctx, query)
 }
 
-func (p *Pelucio) FindAccountByID(ctx context.Context, accountID string) (*Account, error) {
+func (p *Pelucio) FindAccountByID(ctx context.Context, accountID uuid.UUID) (*Account, error) {
 	return p.readWriter.ReadAccount(ctx, accountID)
 }
 
@@ -101,7 +106,7 @@ func (p *Pelucio) FindAccountByExternalID(ctx context.Context, externalID string
 	return p.readWriter.ReadAccountByExternalID(ctx, externalID)
 }
 
-func (p *Pelucio) BalanceOf(ctx context.Context, accountID string) (Balance, error) {
+func (p *Pelucio) BalanceOf(ctx context.Context, accountID uuid.UUID) (Balance, error) {
 	account, err := p.readWriter.ReadAccount(ctx, accountID)
 	if err != nil {
 		return nil, err
@@ -110,12 +115,12 @@ func (p *Pelucio) BalanceOf(ctx context.Context, accountID string) (Balance, err
 	return account.Balance, nil
 }
 
-func (p *Pelucio) BalanceOfAccountFromLedger(ctx context.Context, accountID string) (*Account, error) {
-	if accountID == "" {
+func (p *Pelucio) BalanceOfAccountFromLedger(ctx context.Context, accountID uuid.UUID) (Balance, error) {
+	if xuuid.IsNilOrEmpty(accountID) {
 		return nil, ErrRequiredAccountID
 	}
 
-	account, err := p.FindAccountByID(ctx, accountID)
+	account, err := p.readWriter.ReadAccount(ctx, accountID)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +135,7 @@ func (p *Pelucio) BalanceOfAccountFromLedger(ctx context.Context, accountID stri
 		return nil, err
 	}
 
-	return account, nil
+	return account.Balance, nil
 }
 
 func (p *Pelucio) ExecuteTransaction(ctx context.Context, transaction *Transaction) error {
@@ -159,7 +164,7 @@ func (p *Pelucio) ExecuteTransaction(ctx context.Context, transaction *Transacti
 	return p.readWriter.WriteTransaction(ctx, transaction, accounts...)
 }
 
-func (p *Pelucio) RevertTransaction(ctx context.Context, originalTransactionID string) error {
+func (p *Pelucio) RevertTransaction(ctx context.Context, originalTransactionID uuid.UUID) error {
 	originalTransaction, err := p.readWriter.ReadTransaction(ctx, originalTransactionID)
 	if err != nil {
 		return err
@@ -179,8 +184,8 @@ func (p *Pelucio) RevertTransaction(ctx context.Context, originalTransactionID s
 	return nil
 }
 
-func (p *Pelucio) EntriesOfAccount(ctx context.Context, accountID string) ([]*Entry, error) {
-	if accountID == "" {
+func (p *Pelucio) EntriesOfAccount(ctx context.Context, accountID uuid.UUID) ([]*Entry, error) {
+	if xuuid.IsNilOrEmpty(accountID) {
 		return nil, ErrRequiredAccountID
 	}
 

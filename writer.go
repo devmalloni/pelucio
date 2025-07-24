@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"time"
+
+	"github.com/gofrs/uuid/v5"
 )
 
 var (
@@ -38,14 +40,14 @@ type (
 	}
 
 	Reader interface {
-		ReadAccount(ctx context.Context, accountID string) (*Account, error)
+		ReadAccount(ctx context.Context, accountID uuid.UUID) (*Account, error)
 		ReadAccountByExternalID(ctx context.Context, externalID string) (*Account, error)
 		ReadAccounts(ctx context.Context, filter ReadAccountFilter) ([]*Account, error)
 
-		ReadTransaction(ctx context.Context, transactionID string) (*Transaction, error)
+		ReadTransaction(ctx context.Context, transactionID uuid.UUID) (*Transaction, error)
 		ReadTransactions(ctx context.Context, filter ReadTransactionFilter) ([]*Transaction, error)
 
-		ReadEntriesOfAccount(ctx context.Context, accountID string) ([]*Entry, error)
+		ReadEntriesOfAccount(ctx context.Context, accountID uuid.UUID) ([]*Entry, error)
 		ReadEntries(ctx context.Context, filter ReadEntryFilter) ([]*Entry, error)
 	}
 

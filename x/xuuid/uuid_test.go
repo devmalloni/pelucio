@@ -7,7 +7,7 @@ import (
 func TestNew(t *testing.T) {
 	id := New()
 
-	if !id.IsNil() {
+	if IsNilOrEmpty(id) {
 		t.Errorf("expected uuid to be valid")
 	}
 }
