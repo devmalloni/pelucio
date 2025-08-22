@@ -3,6 +3,7 @@ package pelucio
 import (
 	"math/big"
 	"pelucio/x/xuuid"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -510,5 +511,46 @@ func TestBalance_HasBalance_EmptyBalance(t *testing.T) {
 
 	if b.HasBalance() {
 		t.Fatalf("expected has balance to be false")
+	}
+}
+
+func TestBalance_Decimal(t *testing.T) {
+	b := Balance{
+		"brl": big.NewInt(12345), // 123.45
+		"usd": big.NewInt(6789),  // 67.89
+	}
+
+	decimals := b.Decimal(4)
+
+	expected := map[Currency]string{
+		"brl": "1.2345",
+		"usd": "0.6789",
+	}
+
+	if !reflect.DeepEqual(decimals, expected) {
+		t.Fatalf("expected decimals to be %v, got %v", expected, decimals)
+	}
+}
+
+func TestBalance_DecimalFromMap(t *testing.T) {
+	b := Balance{
+		"brl": big.NewInt(12345), // 123.45
+		"usd": big.NewInt(6789),  // 67.89
+		"btc": big.NewInt(1),     // 67.89
+	}
+
+	decimals := b.DecimalFromMap(map[Currency]int{
+		"brl": 4,
+		"usd": 2,
+	}, 8)
+
+	expected := map[Currency]string{
+		"brl": "1.2345",
+		"usd": "67.89",
+		"btc": "0.00000001",
+	}
+
+	if !reflect.DeepEqual(decimals, expected) {
+		t.Fatalf("expected decimals to be %v, got %v", expected, decimals)
 	}
 }

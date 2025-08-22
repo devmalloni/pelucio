@@ -204,3 +204,27 @@ func (p Balance) Clear() {
 		delete(p, k)
 	}
 }
+
+func (p Balance) Decimal(precision int) map[Currency]string {
+	res := make(map[Currency]string, len(p))
+
+	for currency, amount := range p {
+		res[currency] = ToString(amount, precision)
+	}
+
+	return res
+}
+
+func (p Balance) DecimalFromMap(precisions map[Currency]int, defaultPrecision int) map[Currency]string {
+	res := make(map[Currency]string, len(p))
+
+	for currency, amount := range p {
+		if precision, ok := precisions[currency]; ok {
+			res[currency] = ToString(amount, precision)
+		} else {
+			res[currency] = ToString(amount, defaultPrecision)
+		}
+	}
+
+	return res
+}
