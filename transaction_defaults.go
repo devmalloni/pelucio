@@ -6,12 +6,21 @@ import (
 	"github.com/gofrs/uuid/v5"
 )
 
-// Transfer creates a transaction for transferring an amount from one account to another.
-func Transfer(externalID string, fromAccountID, toAccountID uuid.UUID, amount *big.Int, currency Currency) *Transaction {
+// TransferBetweenCreditAccounts creates a transaction for transferring an amount from one credit account to another.
+func TransferBetweenCreditAccounts(externalID string, fromAccountID, toAccountID uuid.UUID, amount *big.Int, currency Currency) *Transaction {
 	return NewTransaction(nil).
 		WithExternalID(externalID).
 		AddEntry(fromAccountID, Debit, Credit, amount, currency).
 		AddEntry(toAccountID, Credit, Credit, amount, currency).
+		MustBuild()
+}
+
+// TransferBetweenDebitAccounts creates a transaction for transferring an amount from one debit account to another.
+func TransferBetweenDebitAccounts(externalID string, fromAccountID, toAccountID uuid.UUID, amount *big.Int, currency Currency) *Transaction {
+	return NewTransaction(nil).
+		WithExternalID(externalID).
+		AddEntry(fromAccountID, Credit, Debit, amount, currency).
+		AddEntry(toAccountID, Debit, Credit, amount, currency).
 		MustBuild()
 }
 

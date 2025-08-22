@@ -107,6 +107,14 @@ func (p Entry) OperationOnBalance() OperationKind {
 	}
 }
 
+func (p Balance) Get(currency Currency) *big.Int {
+	if amount, ok := p[currency]; ok {
+		return amount
+	}
+
+	return big.NewInt(0)
+}
+
 func (p Balance) Add(currency Currency, amount *big.Int) error {
 	if amount.Cmp(big.NewInt(0)) <= 0 {
 		return ErrNotPositiveAmount
