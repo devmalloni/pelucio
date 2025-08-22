@@ -40,24 +40,24 @@ func (p *Pelucio) CreateAccount(ctx context.Context,
 	externalID,
 	name string,
 	normalSide EntrySide,
-	metadata json.RawMessage) error {
+	metadata json.RawMessage) (*Account, error) {
 	account := NewAccount(externalID, name, normalSide, metadata, p.clock)
 
 	_, err := p.readWriter.ReadAccountByExternalID(ctx, externalID)
 	if err != nil && err != ErrNotFound {
-		return err
+		return nil, err
 	}
 
 	if err == nil {
-		return ErrExternalIDAlreadyInUse
+		return nil, ErrExternalIDAlreadyInUse
 	}
 
 	err = p.readWriter.WriteAccount(ctx, account, false)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return account, nil
 }
 
 func (p *Pelucio) DeleteAccount(ctx context.Context, accountID uuid.UUID) error {

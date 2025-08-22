@@ -26,7 +26,7 @@ func TestPelucio_CreateAccount_Success(t *testing.T) {
 		On("WriteAccount", mock.AnythingOfType("*pelucio.Account"), false).
 		Return(nil)
 
-	err := pelucio.CreateAccount(context.Background(), externalID, "name", Debit, nil)
+	_, err := pelucio.CreateAccount(context.Background(), externalID, "name", Debit, nil)
 
 	if err != nil {
 		t.Fatalf("expected no error. got %v", err)
@@ -48,7 +48,7 @@ func TestPelucio_CreateAccount_ExternalIDError(t *testing.T) {
 		On("ReadAccountByExternalID", externalID).
 		Return(expectedAccount, nil)
 
-	err := pelucio.CreateAccount(context.Background(), externalID, "name", Debit, nil)
+	_, err := pelucio.CreateAccount(context.Background(), externalID, "name", Debit, nil)
 
 	if err != ErrExternalIDAlreadyInUse {
 		t.Fatalf("expected error ErrExternalIDAlreadyInUse. got %v", err)
@@ -69,7 +69,7 @@ func TestPelucio_CreateAccount_AnyReadError(t *testing.T) {
 		On("ReadAccountByExternalID", externalID).
 		Return(nil, expectedErr)
 
-	err := pelucio.CreateAccount(context.Background(), externalID, "name", Debit, nil)
+	_, err := pelucio.CreateAccount(context.Background(), externalID, "name", Debit, nil)
 
 	if err != expectedErr {
 		t.Fatalf("expected error. got %v", err)
@@ -95,7 +95,7 @@ func TestPelucio_CreateAccount_AnyWriteErr(t *testing.T) {
 		On("WriteAccount", mock.AnythingOfType("*pelucio.Account"), false).
 		Return(expectedErr)
 
-	err := pelucio.CreateAccount(context.Background(), externalID, "name", Debit, nil)
+	_, err := pelucio.CreateAccount(context.Background(), externalID, "name", Debit, nil)
 
 	if err != expectedErr {
 		t.Fatalf("expected error. got %v", err)
