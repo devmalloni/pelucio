@@ -3,8 +3,9 @@ package pelucio
 import (
 	"encoding/json"
 	"errors"
-	"pelucio/x/xtime"
 	"time"
+
+	"github.com/devmalloni/pelucio/x/xtime"
 
 	"github.com/gofrs/uuid/v5"
 )

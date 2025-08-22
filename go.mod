@@ -1,4 +1,4 @@
-module pelucio
+module github.com/devmalloni/pelucio
 
 go 1.21.0
 

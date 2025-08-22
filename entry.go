@@ -3,9 +3,10 @@ package pelucio
 import (
 	"errors"
 	"math/big"
-	"pelucio/x/xtime"
-	"pelucio/x/xuuid"
 	"time"
+
+	"github.com/devmalloni/pelucio/x/xtime"
+	"github.com/devmalloni/pelucio/x/xuuid"
 
 	"github.com/gofrs/uuid/v5"
 )

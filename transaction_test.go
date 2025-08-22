@@ -2,9 +2,10 @@ package pelucio
 
 import (
 	"math/big"
-	"pelucio/x/xtime"
-	"pelucio/x/xuuid"
 	"testing"
+
+	"github.com/devmalloni/pelucio/x/xtime"
+	"github.com/devmalloni/pelucio/x/xuuid"
 
 	"github.com/gofrs/uuid/v5"
 )

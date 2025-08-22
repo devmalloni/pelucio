@@ -1,7 +1,7 @@
 package pelucio
 
 import (
-	"pelucio/x/xuuid"
+	"github.com/devmalloni/pelucio/x/xuuid"
 
 	"github.com/gofrs/uuid/v5"
 )

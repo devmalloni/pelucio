@@ -2,10 +2,11 @@ package pelucio
 
 import (
 	"math/big"
-	"pelucio/x/xuuid"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/devmalloni/pelucio/x/xuuid"
 )
 
 func TestEntry_Apply_ErrNilBalance(t *testing.T) {

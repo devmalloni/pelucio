@@ -2,10 +2,11 @@ package pelucio
 
 import (
 	"math/big"
-	"pelucio/x/xtime"
-	"pelucio/x/xuuid"
 	"testing"
 	"time"
+
+	"github.com/devmalloni/pelucio/x/xtime"
+	"github.com/devmalloni/pelucio/x/xuuid"
 )
 
 var stubClock = xtime.NewStubClock(time.Now())

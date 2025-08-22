@@ -1,6 +1,6 @@
 package pelucio
 
-import "pelucio/x/xtime"
+import "github.com/devmalloni/pelucio/x/xtime"
 
 type PelucionOpt func(p *Pelucio)
 

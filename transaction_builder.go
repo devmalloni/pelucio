@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"math/big"
-	"pelucio/x/xtime"
-	"pelucio/x/xuuid"
+
+	"github.com/devmalloni/pelucio/x/xtime"
+	"github.com/devmalloni/pelucio/x/xuuid"
 
 	"github.com/gofrs/uuid/v5"
 )
