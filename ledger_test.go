@@ -21,7 +21,7 @@ func TestLedger_Compute(t *testing.T) {
 		Deposit("deposit-3", cashAccount, anotherClientAccount, big.NewInt(10), "BRL"),
 		Withdraw("withdraw-2", cashAccount, anotherClientAccount, big.NewInt(3), "BRL"),
 		Deposit("deposit-4", cashAccount, anotherClientAccount, big.NewInt(10), "EUR"),
-		Transfer("transfer-1", anotherClientAccount, clientAccount, big.NewInt(5), "BRL"),
+		TransferBetweenCreditAccounts("transfer-1", anotherClientAccount, clientAccount, big.NewInt(5), "BRL"),
 	}
 
 	ledger, err := ComputeLedger(transactions)

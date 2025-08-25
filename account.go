@@ -27,7 +27,7 @@ type (
 		Balance    Balance         `json:"balance" db:"balance"`
 		Metadata   json.RawMessage `json:"metadata" db:"metadata"`
 
-		Version   int64      `json:"version" db:"version"`
+		Version   int64      `json:"version" db:"version"` // version must be handled by persistence layer
 		CreatedAt time.Time  `json:"created_at" db:"created_at"`
 		UpdatedAt *time.Time `json:"updated_at" db:"updated_at"`
 		DeletedAt *time.Time `json:"deleted_at" db:"deleted_at"`
@@ -46,7 +46,6 @@ func NewAccount(externalID,
 		NormalSide: normalSide,
 		Metadata:   metadata,
 		Balance:    make(Balance),
-		Version:    clock.Now().UnixNano(),
 		CreatedAt:  clock.Now(),
 	}
 }
@@ -75,7 +74,6 @@ func (p *Account) Apply(e Entry, clock xtime.Clock) error {
 		return err
 	}
 
-	p.Version = clock.Now().UnixNano()
 	p.UpdatedAt = clock.NilNow()
 
 	return nil
