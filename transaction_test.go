@@ -26,7 +26,7 @@ func TestTransaction_ApplyToAccounts(t *testing.T) {
 	transaction := &Transaction{
 		ID: xuuid.MustParseString("e6a4f6b1-649a-4bcb-a8ea-43dc82d5e7fd"),
 	}
-	err := transaction.ApplyToAccounts(nil)
+	err := transaction.ApplyToAccounts(nil, xtime.DefaultClock)
 	if err != ErrNoAccountProvided {
 		t.Fatalf("expected ErrNoAccountProvided")
 	}
@@ -37,7 +37,7 @@ func TestTransaction_ApplyToAccounts(t *testing.T) {
 	}
 	accounts[firstAccount.ID] = firstAccount
 
-	err = transaction.ApplyToAccounts(accounts)
+	err = transaction.ApplyToAccounts(accounts, xtime.DefaultClock)
 	if err != ErrEntriesNotFound {
 		t.Fatalf("expected ErrEntriesNotFound")
 	}
@@ -50,7 +50,7 @@ func TestTransaction_ApplyToAccounts(t *testing.T) {
 		Amount:      big.NewInt(1),
 	})
 
-	err = transaction.ApplyToAccounts(accounts)
+	err = transaction.ApplyToAccounts(accounts, xtime.DefaultClock)
 	if err != ErrTransactionIsNotBalanced {
 		t.Fatalf("expected ErrTransactionIsNotBalanced")
 	}
@@ -64,13 +64,13 @@ func TestTransaction_ApplyToAccounts(t *testing.T) {
 		Amount:        big.NewInt(1),
 	})
 
-	err = transaction.ApplyToAccounts(accounts)
+	err = transaction.ApplyToAccounts(accounts, xtime.DefaultClock)
 	if err != ErrAccountNotFound {
 		t.Fatalf("expected ErrAccountNotFound")
 	}
 	transaction.Entries[0].AccountID = firstAccount.ID
 
-	err = transaction.ApplyToAccounts(accounts)
+	err = transaction.ApplyToAccounts(accounts, xtime.DefaultClock)
 	if err != ErrEntryTransactionMismatch {
 		t.Fatalf("expected ErrEntryTransactionMismatch. got %v", err)
 	}
@@ -78,7 +78,7 @@ func TestTransaction_ApplyToAccounts(t *testing.T) {
 	transaction.Entries[0].TransactionID = transaction.ID
 
 	transaction.Entries[0].Amount = big.NewInt(1)
-	err = transaction.ApplyToAccounts(accounts)
+	err = transaction.ApplyToAccounts(accounts, xtime.DefaultClock)
 	if err != nil {
 		t.Fatalf("expected error nil. got %v", err)
 	}
@@ -88,7 +88,7 @@ func TestTransaction_ApplyToAccounts_ErrOnApply(t *testing.T) {
 	transaction := &Transaction{
 		ID: xuuid.MustParseString("e6a4f6b1-649a-4bcb-a8ea-43dc82d5e7fd"),
 	}
-	err := transaction.ApplyToAccounts(nil)
+	err := transaction.ApplyToAccounts(nil, xtime.DefaultClock)
 	if err != ErrNoAccountProvided {
 		t.Fatalf("expected ErrNoAccountProvided")
 	}
@@ -107,7 +107,7 @@ func TestTransaction_ApplyToAccounts_ErrOnApply(t *testing.T) {
 		Amount:        big.NewInt(0),
 	})
 
-	err = transaction.ApplyToAccounts(accounts)
+	err = transaction.ApplyToAccounts(accounts, xtime.DefaultClock)
 	if err != ErrNotPositiveAmount {
 		t.Fatalf("expected ErrNotPositiveAmount. got %v", err)
 	}

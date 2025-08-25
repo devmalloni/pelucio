@@ -155,7 +155,7 @@ func (p *Pelucio) ExecuteTransaction(ctx context.Context, transaction *Transacti
 		return a.ID
 	})
 
-	err = transaction.ApplyToAccounts(accountMap)
+	err = transaction.ApplyToAccounts(accountMap, p.clock)
 	if err != nil {
 		return err
 	}

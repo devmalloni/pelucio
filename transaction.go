@@ -72,7 +72,7 @@ func (p *Transaction) IsBalanced() bool {
 	return balanceOwn.IsBalanced(balanceOwe)
 }
 
-func (p *Transaction) ApplyToAccounts(accounts map[uuid.UUID]*Account) error {
+func (p *Transaction) ApplyToAccounts(accounts map[uuid.UUID]*Account, clock xtime.Clock) error {
 	if len(accounts) == 0 {
 		return ErrNoAccountProvided
 	}
@@ -95,7 +95,7 @@ func (p *Transaction) ApplyToAccounts(accounts map[uuid.UUID]*Account) error {
 			return ErrEntryTransactionMismatch
 		}
 
-		if err := entry.Apply(account.Balance); err != nil {
+		if err := account.Apply(*entry, clock); err != nil {
 			return err
 		}
 	}
