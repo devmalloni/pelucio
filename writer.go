@@ -9,8 +9,7 @@ import (
 )
 
 var (
-	ErrNotFound         = errors.New("record not found")
-	ErrDuplicatedRecord = errors.New("duplicated record")
+	ErrNotFound = errors.New("record not found")
 )
 
 type (
