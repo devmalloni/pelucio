@@ -45,6 +45,12 @@ func (p *ReadWriterMock) ReadTransaction(ctx context.Context, transactionID uuid
 	return res, args.Error(1)
 }
 
+func (p *ReadWriterMock) ReadTransactionByExternalID(ctx context.Context, externalID string) (*Transaction, error) {
+	args := p.Called(externalID)
+	res, _ := args.Get(0).(*Transaction)
+	return res, args.Error(1)
+}
+
 func (p *ReadWriterMock) ReadTransactions(ctx context.Context, filter ReadTransactionFilter) ([]*Transaction, error) {
 	args := p.Called(filter)
 	res, _ := args.Get(0).([]*Transaction)

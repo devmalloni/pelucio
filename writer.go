@@ -46,6 +46,7 @@ type (
 		ReadAccounts(ctx context.Context, filter ReadAccountFilter) ([]*Account, error)
 
 		ReadTransaction(ctx context.Context, transactionID uuid.UUID) (*Transaction, error)
+		ReadTransactionByExternalID(ctx context.Context, externalID string) (*Transaction, error)
 		ReadTransactions(ctx context.Context, filter ReadTransactionFilter) ([]*Transaction, error)
 
 		ReadEntriesOfAccount(ctx context.Context, accountID uuid.UUID) ([]*Entry, error)

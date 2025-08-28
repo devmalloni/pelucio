@@ -107,6 +107,14 @@ func (p *Pelucio) FindAccountByExternalID(ctx context.Context, externalID string
 	return p.readWriter.ReadAccountByExternalID(ctx, externalID)
 }
 
+func (p *Pelucio) FindTransactionByID(ctx context.Context, id uuid.UUID) (*Transaction, error) {
+	return p.readWriter.ReadTransaction(ctx, id)
+}
+
+func (p *Pelucio) FindTransactioByExternalID(ctx context.Context, externalID string) (*Transaction, error) {
+	return p.readWriter.ReadTransactionByExternalID(ctx, externalID)
+}
+
 func (p *Pelucio) BalanceOf(ctx context.Context, accountID uuid.UUID) (Balance, error) {
 	account, err := p.readWriter.ReadAccount(ctx, accountID)
 	if err != nil {
@@ -144,6 +152,15 @@ func (p *Pelucio) ExecuteTransaction(ctx context.Context, transaction *Transacti
 		return ErrTransactionNil
 	}
 
+	// check for existing external id
+	_, err := p.readWriter.ReadTransactionByExternalID(ctx, transaction.ExternalID)
+	if err != nil && err != ErrNotFound {
+		return err
+	}
+	if err == nil {
+		return ErrExternalIDAlreadyInUse
+	}
+
 	accounts, err := p.FindAccounts(ctx, ReadAccountFilter{
 		AccountIDs: xuuid.ToStrings(transaction.Accounts()...),
 	})
@@ -165,16 +182,17 @@ func (p *Pelucio) ExecuteTransaction(ctx context.Context, transaction *Transacti
 	return p.readWriter.WriteTransaction(ctx, transaction, accounts...)
 }
 
-func (p *Pelucio) RevertTransaction(ctx context.Context, originalTransactionID uuid.UUID) error {
+func (p *Pelucio) RevertTransaction(ctx context.Context, originalTransactionID uuid.UUID, externalID string) error {
 	originalTransaction, err := p.readWriter.ReadTransaction(ctx, originalTransactionID)
 	if err != nil {
 		return err
 	}
 
-	// TODO: external ID
-	externalId := fmt.Sprintf("%s-%s", originalTransaction.ExternalID, "revert")
+	if externalID == "" {
+		externalID = fmt.Sprintf("%s-%s", originalTransaction.ExternalID, "revert")
+	}
 	revertTransaction := originalTransaction.
-		Reverse(externalId,
+		Reverse(externalID,
 			fmt.Sprintf("reverted transaction %s", originalTransactionID), p.clock)
 
 	err = p.ExecuteTransaction(ctx, revertTransaction)
