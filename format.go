@@ -4,6 +4,15 @@ import (
 	"math/big"
 )
 
+func MustFromString(s string, precision int) *big.Int {
+	b, err := FromString(s, precision)
+	if err != nil {
+		panic(err)
+	}
+
+	return b
+}
+
 func FromString(s string, precision int) (*big.Int, error) {
 	f, _, err := big.ParseFloat(s, 10, 256, big.ToNearestEven)
 	if err != nil {
