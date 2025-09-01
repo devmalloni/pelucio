@@ -15,3 +15,9 @@ func WithClock(clock xtime.Clock) PelucionOpt {
 		p.clock = clock
 	}
 }
+
+func WithSyncer(syncer Syncer) PelucionOpt {
+	return func(p *Pelucio) {
+		p.syncer = syncer
+	}
+}

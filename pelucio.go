@@ -21,12 +21,14 @@ var (
 
 type Pelucio struct {
 	readWriter ReadWriter
+	syncer     Syncer
 	clock      xtime.Clock
 }
 
 func NewPelucio(opts ...PelucionOpt) *Pelucio {
 	p := &Pelucio{
-		clock: xtime.StdClock{},
+		clock:  xtime.StdClock{},
+		syncer: &NoOpSyncer{},
 	}
 
 	for _, opt := range opts {
@@ -170,6 +172,9 @@ func (p *Pelucio) BalanceOfAccountFromLedger(ctx context.Context, accountID uuid
 }
 
 func (p *Pelucio) ExecuteTransaction(ctx context.Context, transaction *Transaction) error {
+	p.syncer.Lock(ctx)
+	defer p.syncer.Unlock(ctx)
+
 	if transaction == nil {
 		return ErrTransactionNil
 	}
