@@ -31,7 +31,7 @@ func TestTransaction_ApplyToAccounts(t *testing.T) {
 		t.Fatalf("expected ErrNoAccountProvided")
 	}
 
-	firstAccount := NewAccount("", "", Credit, nil, xtime.DefaultClock)
+	firstAccount := NewAccount(xtime.DefaultClock, WithNormalSide(Credit))
 	accounts := map[uuid.UUID]*Account{
 		firstAccount.ID: nil,
 	}
@@ -93,7 +93,7 @@ func TestTransaction_ApplyToAccounts_ErrOnApply(t *testing.T) {
 		t.Fatalf("expected ErrNoAccountProvided")
 	}
 
-	firstAccount := NewAccount("", "", Credit, nil, xtime.DefaultClock)
+	firstAccount := NewAccount(xtime.DefaultClock, WithNormalSide(Credit))
 	accounts := map[uuid.UUID]*Account{
 		firstAccount.ID: nil,
 	}

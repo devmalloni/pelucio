@@ -15,6 +15,9 @@ var (
 	ErrEntryAccountMismatch = errors.New("entry account ID does not match account ID")
 	ErrAccountSideMismatch  = errors.New("account side does not match normal side")
 	ErrBalanceNotEmpty      = errors.New("cannot delete account with non-zero balance")
+	ErrInvalidNormalSide    = errors.New("invalid normal side")
+	ErrInvalidID            = errors.New("invalid id")
+	ErrInvalidExternalID    = errors.New("ErrInvalidExternalID")
 )
 
 type (
@@ -34,20 +37,19 @@ type (
 	}
 )
 
-func NewAccount(externalID,
-	name string,
-	normalSide EntrySide,
-	metadata json.RawMessage,
-	clock xtime.Clock) *Account {
-	return &Account{
+func NewAccount(clock xtime.Clock, opts ...AccountOption) *Account {
+	a := &Account{
 		ID:         xuuid.New(),
-		ExternalID: externalID,
-		Name:       name,
-		NormalSide: normalSide,
-		Metadata:   metadata,
+		ExternalID: xuuid.New().String(),
 		Balance:    make(Balance),
 		CreatedAt:  clock.Now(),
 	}
+
+	for _, opt := range opts {
+		opt(a)
+	}
+
+	return a
 }
 
 func (p *Account) UpdateData(name string, metadata json.RawMessage, clock xtime.Clock) {
@@ -101,6 +103,22 @@ func (p *Account) Delete(clock xtime.Clock) error {
 
 	p.DeletedAt = clock.NilNow()
 	p.UpdatedAt = clock.NilNow()
+
+	return nil
+}
+
+func (p *Account) IsValid() error {
+	if xuuid.IsNilOrEmpty(p.ID) {
+		return ErrInvalidID
+	}
+
+	if p.NormalSide != Debit && p.NormalSide != Credit {
+		return ErrInvalidNormalSide
+	}
+
+	if p.ExternalID == "" {
+		return ErrInvalidExternalID
+	}
 
 	return nil
 }

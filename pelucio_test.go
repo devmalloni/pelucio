@@ -110,7 +110,7 @@ func TestPelucio_UpdateAccount_Success(t *testing.T) {
 	readWriter := new(ReadWriterMock)
 	pelucio := NewPelucio(WithReadWriter(readWriter), WithClock(xtime.DefaultClock))
 
-	account := NewAccount("external_id", "name", Debit, nil, xtime.DefaultClock)
+	account := NewAccount(xtime.DefaultClock, WithExternalID("external_id"), WithName("name"), WithNormalSide(Debit))
 
 	readWriter.
 		On("ReadAccount", account.ID).
@@ -135,7 +135,7 @@ func TestPelucio_UpdateAccount_AccountNotFound(t *testing.T) {
 	readWriter := new(ReadWriterMock)
 	pelucio := NewPelucio(WithReadWriter(readWriter), WithClock(xtime.DefaultClock))
 
-	account := NewAccount("external_id", "name", Debit, nil, xtime.DefaultClock)
+	account := NewAccount(xtime.DefaultClock, WithExternalID("external_id"), WithName("name"), WithNormalSide(Debit))
 	readWriter.
 		On("ReadAccount", account.ID).
 		Return(nil, ErrNotFound)
@@ -155,7 +155,7 @@ func TestPelucio_UpdateAccount_WriteError(t *testing.T) {
 	readWriter := new(ReadWriterMock)
 	pelucio := NewPelucio(WithReadWriter(readWriter), WithClock(xtime.DefaultClock))
 
-	account := NewAccount("external_id", "name", Debit, nil, xtime.DefaultClock)
+	account := NewAccount(xtime.DefaultClock, WithExternalID("external_id"), WithName("name"), WithNormalSide(Debit))
 
 	readWriter.
 		On("ReadAccount", account.ID).
@@ -180,7 +180,7 @@ func TestPelucio_DeleteAccount_Success(t *testing.T) {
 	readWriter := new(ReadWriterMock)
 	pelucio := NewPelucio(WithReadWriter(readWriter), WithClock(xtime.DefaultClock))
 
-	account := NewAccount("external_id", "name", Debit, nil, xtime.DefaultClock)
+	account := NewAccount(xtime.DefaultClock, WithExternalID("external_id"), WithName("name"), WithNormalSide(Debit))
 
 	readWriter.
 		On("ReadAccount", account.ID).
@@ -205,7 +205,7 @@ func TestPelucio_DeleteAccount_AccountNotFound(t *testing.T) {
 	readWriter := new(ReadWriterMock)
 	pelucio := NewPelucio(WithReadWriter(readWriter), WithClock(xtime.DefaultClock))
 
-	account := NewAccount("external_id", "name", Debit, nil, xtime.DefaultClock)
+	account := NewAccount(xtime.DefaultClock, WithExternalID("external_id"), WithName("name"), WithNormalSide(Debit))
 	readWriter.
 		On("ReadAccount", account.ID).
 		Return(nil, ErrNotFound)
@@ -225,7 +225,7 @@ func TestPelucio_DeleteAccount_AccountWithBalance(t *testing.T) {
 	readWriter := new(ReadWriterMock)
 	pelucio := NewPelucio(WithReadWriter(readWriter), WithClock(xtime.DefaultClock))
 
-	account := NewAccount("external_id", "name", Debit, nil, xtime.DefaultClock)
+	account := NewAccount(xtime.DefaultClock, WithExternalID("external_id"), WithName("name"), WithNormalSide(Debit))
 	account.Balance = Balance{
 		Currency("BRL"): big.NewInt(1),
 	}
@@ -249,7 +249,7 @@ func TestPelucio_DeleteAccount_WriteError(t *testing.T) {
 	readWriter := new(ReadWriterMock)
 	pelucio := NewPelucio(WithReadWriter(readWriter), WithClock(xtime.DefaultClock))
 
-	account := NewAccount("external_id", "name", Debit, nil, xtime.DefaultClock)
+	account := NewAccount(xtime.DefaultClock, WithExternalID("external_id"), WithName("name"), WithNormalSide(Debit))
 
 	readWriter.
 		On("ReadAccount", account.ID).
@@ -277,7 +277,7 @@ func TestPelucio_FindAccounts(t *testing.T) {
 	query := ReadAccountFilter{
 		FromDate: xtime.DefaultClock.NilNow(),
 	}
-	account := NewAccount("external_id", "name", Debit, nil, xtime.DefaultClock)
+	account := NewAccount(xtime.DefaultClock, WithExternalID("external_id"), WithName("name"), WithNormalSide(Debit))
 
 	readWriter.
 		On("ReadAccounts", query).
@@ -302,7 +302,7 @@ func TestPelucio_FindAccountByID(t *testing.T) {
 	readWriter := new(ReadWriterMock)
 	pelucio := NewPelucio(WithReadWriter(readWriter), WithClock(xtime.DefaultClock))
 
-	account := NewAccount("external_id", "name", Debit, nil, xtime.DefaultClock)
+	account := NewAccount(xtime.DefaultClock, WithExternalID("external_id"), WithName("name"), WithNormalSide(Debit))
 
 	readWriter.
 		On("ReadAccount", account.ID).
@@ -327,7 +327,7 @@ func TestPelucio_FindAccountByExternalID(t *testing.T) {
 	readWriter := new(ReadWriterMock)
 	pelucio := NewPelucio(WithReadWriter(readWriter), WithClock(xtime.DefaultClock))
 
-	account := NewAccount("external_id", "name", Debit, nil, xtime.DefaultClock)
+	account := NewAccount(xtime.DefaultClock, WithExternalID("external_id"), WithName("name"), WithNormalSide(Debit))
 
 	readWriter.
 		On("ReadAccountByExternalID", account.ExternalID).
@@ -352,7 +352,7 @@ func TestPelucio_BalanceOf(t *testing.T) {
 	readWriter := new(ReadWriterMock)
 	pelucio := NewPelucio(WithReadWriter(readWriter), WithClock(xtime.DefaultClock))
 
-	account := NewAccount("external_id", "name", Debit, nil, xtime.DefaultClock)
+	account := NewAccount(xtime.DefaultClock, WithExternalID("external_id"), WithName("name"), WithNormalSide(Debit))
 	account.Balance = Balance{
 		Currency("BRL"): big.NewInt(1),
 	}
@@ -384,7 +384,7 @@ func TestPelucio_BalanceOf_AccountNotFound(t *testing.T) {
 	readWriter := new(ReadWriterMock)
 	pelucio := NewPelucio(WithReadWriter(readWriter), WithClock(xtime.DefaultClock))
 
-	account := NewAccount("external_id", "name", Debit, nil, xtime.DefaultClock)
+	account := NewAccount(xtime.DefaultClock, WithExternalID("external_id"), WithName("name"), WithNormalSide(Debit))
 	readWriter.
 		On("ReadAccount", account.ID).
 		Return(nil, ErrNotFound)
@@ -404,7 +404,7 @@ func TestPelucio_BalanceOfAccountFromLedger_Success(t *testing.T) {
 	readWriter := new(ReadWriterMock)
 	pelucio := NewPelucio(WithReadWriter(readWriter), WithClock(xtime.DefaultClock))
 
-	account := NewAccount("external_id", "name", Debit, nil, xtime.DefaultClock)
+	account := NewAccount(xtime.DefaultClock, WithExternalID("external_id"), WithName("name"), WithNormalSide(Debit))
 	account.Balance = Balance{
 		Currency("BRL"): big.NewInt(1),
 	}
@@ -470,7 +470,7 @@ func TestPelucio_BalanceOfAccountFromLedger_AccountNotFound(t *testing.T) {
 	readWriter := new(ReadWriterMock)
 	pelucio := NewPelucio(WithReadWriter(readWriter), WithClock(xtime.DefaultClock))
 
-	account := NewAccount("external_id", "name", Debit, nil, xtime.DefaultClock)
+	account := NewAccount(xtime.DefaultClock, WithExternalID("external_id"), WithName("name"), WithNormalSide(Debit))
 
 	readWriter.
 		On("ReadAccount", account.ID).
@@ -491,7 +491,7 @@ func TestPelucio_BalanceOfAccountFromLedger_ReadEntriesError(t *testing.T) {
 	readWriter := new(ReadWriterMock)
 	pelucio := NewPelucio(WithReadWriter(readWriter), WithClock(xtime.DefaultClock))
 
-	account := NewAccount("external_id", "name", Debit, nil, xtime.DefaultClock)
+	account := NewAccount(xtime.DefaultClock, WithExternalID("external_id"), WithName("name"), WithNormalSide(Debit))
 	account.Balance = Balance{
 		Currency("BRL"): big.NewInt(1),
 	}
@@ -519,7 +519,7 @@ func TestPelucio_BalanceOfAccountFromLedger_ComputeEntryError(t *testing.T) {
 	readWriter := new(ReadWriterMock)
 	pelucio := NewPelucio(WithReadWriter(readWriter), WithClock(xtime.DefaultClock))
 
-	account := NewAccount("external_id", "name", Debit, nil, xtime.DefaultClock)
+	account := NewAccount(xtime.DefaultClock, WithExternalID("external_id"), WithName("name"), WithNormalSide(Debit))
 	account.Balance = Balance{
 		Currency("BRL"): big.NewInt(1),
 	}

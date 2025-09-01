@@ -36,23 +36,45 @@ func NewPelucio(opts ...PelucionOpt) *Pelucio {
 	return p
 }
 
+func (p *Pelucio) CreateAccountRaw(ctx context.Context,
+	account *Account) error {
+	if account == nil {
+		return errors.New("account cannot be nil")
+	}
+
+	if err := account.IsValid(); err != nil {
+		return err
+	}
+
+	_, err := p.readWriter.ReadAccountByExternalID(ctx, account.ExternalID)
+	if err != nil && err != ErrNotFound {
+		return err
+	}
+
+	if err == nil {
+		return ErrExternalIDAlreadyInUse
+	}
+
+	err = p.readWriter.WriteAccount(ctx, account, false)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (p *Pelucio) CreateAccount(ctx context.Context,
 	externalID,
 	name string,
 	normalSide EntrySide,
 	metadata json.RawMessage) (*Account, error) {
-	account := NewAccount(externalID, name, normalSide, metadata, p.clock)
+	account := NewAccount(p.clock,
+		WithExternalID(externalID),
+		WithName(name),
+		WithMetadata(metadata),
+		WithNormalSide(normalSide))
 
-	_, err := p.readWriter.ReadAccountByExternalID(ctx, externalID)
-	if err != nil && err != ErrNotFound {
-		return nil, err
-	}
-
-	if err == nil {
-		return nil, ErrExternalIDAlreadyInUse
-	}
-
-	err = p.readWriter.WriteAccount(ctx, account, false)
+	err := p.CreateAccountRaw(ctx, account)
 	if err != nil {
 		return nil, err
 	}

@@ -66,7 +66,7 @@ func TestAccount_Apply_NoBalance(t *testing.T) {
 }
 
 func TestAccount_UpdateData(t *testing.T) {
-	a := NewAccount("bar", "name", Credit, nil, stubClock)
+	a := NewAccount(stubClock, WithExternalID("bar"), WithName("name"), WithNormalSide(Credit))
 	a.Balance = make(Balance)
 	a.Balance.Add("brl", big.NewInt(1))
 
