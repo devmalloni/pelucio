@@ -113,6 +113,39 @@ func TestTransaction_ApplyToAccounts_ErrOnApply(t *testing.T) {
 	}
 }
 
+func TestTransaction_ApplyToAccounts_AlreadyExecuted(t *testing.T) {
+	transaction := &Transaction{
+		ID:         xuuid.MustParseString("e6a4f6b1-649a-4bcb-a8ea-43dc82d5e7fd"),
+		ExecutedAt: xtime.DefaultClock.NilNow(),
+	}
+	firstAccount := NewAccount(xtime.DefaultClock, WithNormalSide(Credit))
+	accounts := map[uuid.UUID]*Account{
+		firstAccount.ID: nil,
+	}
+	accounts[firstAccount.ID] = firstAccount
+	transaction.Entries = append(transaction.Entries, &Entry{
+		ID:            xuuid.MustParseString("962fec36-3a62-4c48-ab10-c5d3f62135c0"),
+		TransactionID: transaction.ID,
+		AccountID:     firstAccount.ID,
+		AccountSide:   Credit,
+		EntrySide:     Credit,
+		Amount:        big.NewInt(1),
+	})
+	transaction.Entries = append(transaction.Entries, &Entry{
+		ID:            xuuid.MustParseString("54233be4-0ae1-4286-8367-260ca9089a5d"),
+		TransactionID: transaction.ID,
+		AccountID:     firstAccount.ID,
+		AccountSide:   Credit,
+		EntrySide:     Debit,
+		Amount:        big.NewInt(1),
+	})
+
+	err := transaction.ApplyToAccounts(accounts, xtime.DefaultClock)
+	if err != ErrTransactionAlreadyExecuted {
+		t.Fatalf("expected ErrTransactionAlreadyExecuted. got %v", err)
+	}
+}
+
 func TestTransaction_Accounts(t *testing.T) {
 	transaction := Transaction{
 		Entries: []*Entry{

@@ -11,11 +11,12 @@ import (
 )
 
 var (
-	ErrNoAccountProvided        = errors.New("no accounts provided")
-	ErrEntriesNotFound          = errors.New("no entries in transaction")
-	ErrTransactionIsNotBalanced = errors.New("transaction is not balanced")
-	ErrAccountNotFound          = errors.New("account not found")
-	ErrEntryTransactionMismatch = errors.New("entry transaction ID does not match transaction ID")
+	ErrNoAccountProvided          = errors.New("no accounts provided")
+	ErrEntriesNotFound            = errors.New("no entries in transaction")
+	ErrTransactionIsNotBalanced   = errors.New("transaction is not balanced")
+	ErrAccountNotFound            = errors.New("account not found")
+	ErrEntryTransactionMismatch   = errors.New("entry transaction ID does not match transaction ID")
+	ErrTransactionAlreadyExecuted = errors.New("transaction already executed")
 )
 
 type (
@@ -25,7 +26,8 @@ type (
 		Description string          `json:"description" db:"description"`
 		Metadata    json.RawMessage `json:"metadata" db:"metadata"`
 
-		CreatedAt time.Time `json:"created_at" db:"created_at"`
+		CreatedAt  time.Time  `json:"created_at" db:"created_at"`
+		ExecutedAt *time.Time `json:"executed_at" db:"executed_at"`
 
 		Entries []*Entry `json:"entries" db:"-"`
 	}
@@ -85,6 +87,10 @@ func (p *Transaction) ApplyToAccounts(accounts map[uuid.UUID]*Account, clock xti
 		return ErrTransactionIsNotBalanced
 	}
 
+	if p.ExecutedAt != nil {
+		return ErrTransactionAlreadyExecuted
+	}
+
 	for _, entry := range p.Entries {
 		account, ok := accounts[entry.AccountID]
 		if !ok {
@@ -99,6 +105,8 @@ func (p *Transaction) ApplyToAccounts(accounts map[uuid.UUID]*Account, clock xti
 			return err
 		}
 	}
+
+	p.ExecutedAt = clock.NilNow()
 
 	return nil
 }
