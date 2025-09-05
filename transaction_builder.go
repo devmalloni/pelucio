@@ -12,6 +12,7 @@ import (
 )
 
 type TransactionBuilder struct {
+	id          uuid.UUID
 	externalID  string
 	description string
 	metadata    json.RawMessage
@@ -28,6 +29,11 @@ func NewTransaction(clock xtime.Clock) *TransactionBuilder {
 	return &TransactionBuilder{
 		defaultClock: clock,
 	}
+}
+
+func (p *TransactionBuilder) WithID(id uuid.UUID) *TransactionBuilder {
+	p.id = id
+	return p
 }
 
 func (p *TransactionBuilder) WithExternalID(externalID string) *TransactionBuilder {
@@ -63,10 +69,12 @@ func (p *TransactionBuilder) AddEntry(accountID uuid.UUID,
 }
 
 func (p *TransactionBuilder) Build() (*Transaction, error) {
-	transactionID := xuuid.New()
+	if xuuid.IsNilOrEmpty(p.id) {
+		p.id = xuuid.New()
+	}
 
 	for _, entry := range p.entries {
-		entry.TransactionID = transactionID
+		entry.TransactionID = p.id
 	}
 
 	if len(p.entries) == 0 {
@@ -78,7 +86,7 @@ func (p *TransactionBuilder) Build() (*Transaction, error) {
 	}
 
 	t := &Transaction{
-		ID:          transactionID,
+		ID:          p.id,
 		ExternalID:  p.externalID,
 		Description: p.description,
 		Metadata:    p.metadata,

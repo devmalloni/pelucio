@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/devmalloni/pelucio/x/xtime"
+	"github.com/devmalloni/pelucio/x/xuuid"
 
 	"github.com/gofrs/uuid/v5"
 )
@@ -136,17 +137,21 @@ func (p *Transaction) SideByAccounts() map[uuid.UUID]EntrySide {
 }
 
 func (p *Transaction) Reverse(externalID, description string, clock xtime.Clock) *Transaction {
-	reversed := &Transaction{
-		ID:          p.ID,
-		ExternalID:  externalID,
-		Description: description,
-		CreatedAt:   clock.Now(),
-	}
+	transactionID := xuuid.New()
+
+	reversed := NewTransaction(clock).
+		WithID(transactionID).
+		WithExternalID(externalID).
+		WithDescription(description)
 
 	for _, entry := range p.Entries {
-		reversedEntry := entry.Reverse(reversed.ID, clock)
-		reversed.Entries = append(reversed.Entries, &reversedEntry)
+		reversedEntry := entry.Reverse(transactionID, clock)
+		reversed.AddEntry(reversedEntry.AccountID,
+			reversedEntry.EntrySide,
+			reversedEntry.AccountSide,
+			reversedEntry.Amount,
+			reversedEntry.Currency)
 	}
 
-	return reversed
+	return reversed.MustBuild()
 }
