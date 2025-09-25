@@ -119,7 +119,7 @@ func (p *Pelucio) UpdateAccount(ctx context.Context, accountID uuid.UUID, name s
 	return nil
 }
 
-func (p *Pelucio) FindAccounts(ctx context.Context, query ReadAccountFilter) ([]*Account, error) {
+func (p *Pelucio) FindAccounts(ctx context.Context, query ReadAccountFilter) (accounts []*Account, paginationToken *string, err error) {
 	return p.readWriter.ReadAccounts(ctx, query)
 }
 
@@ -188,7 +188,7 @@ func (p *Pelucio) ExecuteTransaction(ctx context.Context, transaction *Transacti
 		return ErrExternalIDAlreadyInUse
 	}
 
-	accounts, err := p.FindAccounts(ctx, ReadAccountFilter{
+	accounts, _, err := p.FindAccounts(ctx, ReadAccountFilter{
 		AccountIDs: xuuid.ToStrings(transaction.Accounts()...),
 	})
 	if err != nil {
@@ -238,6 +238,10 @@ func (p *Pelucio) EntriesOfAccount(ctx context.Context, accountID uuid.UUID) ([]
 	return p.readWriter.ReadEntriesOfAccount(ctx, accountID)
 }
 
-func (p *Pelucio) FindEntries(ctx context.Context, filter ReadEntryFilter) ([]*Entry, error) {
+func (p *Pelucio) FindEntries(ctx context.Context, filter ReadEntryFilter) (entries []*Entry, paginationToken *string, err error) {
 	return p.readWriter.ReadEntries(ctx, filter)
+}
+
+func (p *Pelucio) FindTransactions(ctx context.Context, filter ReadTransactionFilter) (transactions []*Transaction, paginationToken *string, err error) {
+	return p.readWriter.ReadTransactions(ctx, filter)
 }

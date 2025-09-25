@@ -33,10 +33,10 @@ func (p *ReadWriterMock) ReadAccountByExternalID(ctx context.Context, externalID
 	return res, args.Error(1)
 }
 
-func (p *ReadWriterMock) ReadAccounts(ctx context.Context, filter ReadAccountFilter) ([]*Account, error) {
+func (p *ReadWriterMock) ReadAccounts(ctx context.Context, filter ReadAccountFilter) (accounts []*Account, paginationToken *string, err error) {
 	args := p.Called(filter)
 	res, _ := args.Get(0).([]*Account)
-	return res, args.Error(1)
+	return res, nil, args.Error(1)
 }
 
 func (p *ReadWriterMock) ReadTransaction(ctx context.Context, transactionID uuid.UUID) (*Transaction, error) {
@@ -51,10 +51,10 @@ func (p *ReadWriterMock) ReadTransactionByExternalID(ctx context.Context, extern
 	return res, args.Error(1)
 }
 
-func (p *ReadWriterMock) ReadTransactions(ctx context.Context, filter ReadTransactionFilter) ([]*Transaction, error) {
+func (p *ReadWriterMock) ReadTransactions(ctx context.Context, filter ReadTransactionFilter) (transactions []*Transaction, paginationToken *string, err error) {
 	args := p.Called(filter)
 	res, _ := args.Get(0).([]*Transaction)
-	return res, args.Error(1)
+	return res, nil, args.Error(1)
 }
 
 func (p *ReadWriterMock) ReadEntriesOfAccount(ctx context.Context, accountID uuid.UUID) ([]*Entry, error) {
@@ -63,8 +63,8 @@ func (p *ReadWriterMock) ReadEntriesOfAccount(ctx context.Context, accountID uui
 	return res, args.Error(1)
 }
 
-func (p *ReadWriterMock) ReadEntries(ctx context.Context, filter ReadEntryFilter) ([]*Entry, error) {
+func (p *ReadWriterMock) ReadEntries(ctx context.Context, filter ReadEntryFilter) (entries []*Entry, paginationToken *string, err error) {
 	args := p.Called(filter)
 	res, _ := args.Get(0).([]*Entry)
-	return res, args.Error(1)
+	return res, nil, args.Error(1)
 }

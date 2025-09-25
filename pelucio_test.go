@@ -283,7 +283,7 @@ func TestPelucio_FindAccounts(t *testing.T) {
 		On("ReadAccounts", query).
 		Return([]*Account{account}, nil)
 
-	accounts, err := pelucio.FindAccounts(context.Background(), query)
+	accounts, _, err := pelucio.FindAccounts(context.Background(), query)
 
 	if err != nil {
 		t.Errorf("expectd error nil. got %v", err)
