@@ -9,7 +9,7 @@ import (
 var Empty = uuid.UUID{}
 
 func New() uuid.UUID {
-	return uuid.Must(uuid.NewV4())
+	return uuid.Must(uuid.NewV7())
 }
 
 func ParseString(s string) (uuid.UUID, error) {
